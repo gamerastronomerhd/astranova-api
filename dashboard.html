@@ -23,45 +23,38 @@
         .topbar { background: var(--bg-panel); border-bottom: 1px solid var(--border-color); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         .topbar h1 { margin: 0; font-size: 24px; color: white; letter-spacing: 1px; }
         .topbar h1 span { color: var(--accent-cyan); }
-        .api-status { font-size: 14px; background: rgba(34, 197, 94, 0.1); color: var(--success); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--success); }
         
-        .support-btn { background: linear-gradient(45deg, #ff69b4, #ff8c00); color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 14px; transition: transform 0.2s, box-shadow 0.2s; border: none; cursor: pointer; }
-        .support-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4); }
+        /* Resource Bar - Fixed Clipping */
+        .res-bar { display: flex; gap: 20px; background: #0f172a; padding: 5px 20px; border-radius: 20px; border: 1px solid #334155; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .res-item { display: flex; align-items: center; gap: 8px; min-width: 90px; }
+        .res-item input { width: 100%; background: transparent; border: none; font-weight: bold; padding: 0; text-align: left; outline: none; font-size: 14px; }
         
-        /* Tabs System */
+        .support-btn { background: linear-gradient(45deg, #ff69b4, #ff8c00); color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 14px; transition: transform 0.2s; cursor: pointer; }
+        .support-btn:hover { transform: translateY(-2px); }
+
+        /* Tabs */
         .tab-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .tabs { display: flex; gap: 10px; border-bottom: 2px solid var(--border-color); margin-bottom: 25px; }
-        .tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 12px 24px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-        .tab-btn:hover { color: white; }
+        .tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 12px 24px; font-size: 16px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: var(--accent-cyan); border-bottom: 2px solid var(--accent-cyan); }
         .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Panels & Inputs */
-        .panel { background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .panel-title { color: white; margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; font-size: 18px; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        input[type="number"], input[type="text"], select { width: 100%; padding: 10px 15px; border-radius: 6px; border: 1px solid #334155; background-color: #0f172a; color: white; box-sizing: border-box; font-size: 14px; }
-        
-        button.action-btn { background-color: var(--accent-cyan); color: #000; border: none; padding: 12px 24px; cursor: pointer; border-radius: 6px; font-weight: bold; width: 100%; transition: background-color 0.2s; }
-        button.action-btn:hover { background-color: #00d2f0; }
-
-        /* Commander UI */
-        .commander-banner { background: linear-gradient(90deg, #1e293b, var(--bg-panel)); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-cyan); padding: 20px 30px; border-radius: 12px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .stat-value { font-size: 32px; font-weight: bold; color: white; text-shadow: 0 2px 10px rgba(0, 242, 254, 0.3); }
-
+        /* Panels */
+        .panel { background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; margin-bottom: 25px; }
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .ship-card { background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; display: flex; gap: 15px; align-items: center; transition: 0.2s; position: relative; overflow: hidden; }
+        .ship-card { background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; display: flex; gap: 15px; align-items: center; position: relative; }
         .ship-card img { width: 85px; height: 85px; border-radius: 8px; object-fit: cover; border: 2px solid #334155; }
         
-        .rarity-SuperRare { border-left: 4px solid #eecc55 !important; }
+        /* Rarity Styles */
+        .rarity-UltraRare { border-left: 4px solid #ff6363 !important; }
+        .rarity-SuperRare { border-left: 4px solid #fbbf24 !important; }
         .rarity-Elite { border-left: 4px solid #c38dff !important; }
-        .rarity-UltraRare { border-left: 4px solid #ff6363 !important; background: linear-gradient(90deg, rgba(255,99,99,0.05), transparent); }
         .rarity-Rare { border-left: 4px solid #4fc3f7 !important; }
-        .oath-badge { color: #ff6363; font-weight: bold; font-size: 0.8em; margin-top: 5px; background: rgba(255,99,99,0.1); padding: 2px 8px; border-radius: 12px; }
 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        
         .eng-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 768px) { .eng-grid { grid-template-columns: 1fr; } }
     </style>
@@ -71,24 +64,24 @@
     <div class="topbar">
         <h1>AstraNova <span>Alpha</span></h1>
         
-        <div style="display: flex; gap: 15px; background: #0f172a; padding: 5px 15px; border-radius: 20px; border: 1px solid #334155;">
-            <div style="display: flex; align-items: center; gap: 5px;" title="Oil">
+        <div class="res-bar">
+            <div class="res-item" title="Oil">
                 <span>🛢️</span>
-                <input type="number" id="res-oil" value="0" onchange="saveResources()" style="width: 60px; background: transparent; border: none; color: white; font-weight: bold; text-align: right; outline: none;">
+                <input type="number" id="res-oil" value="0" onchange="saveResources()" style="color: white;">
             </div>
-            <div style="display: flex; align-items: center; gap: 5px;" title="Coins">
+            <div class="res-item" title="Coins">
                 <span>🪙</span>
-                <input type="number" id="res-coins" value="0" onchange="saveResources()" style="width: 65px; background: transparent; border: none; color: #fbbf24; font-weight: bold; text-align: right; outline: none;">
+                <input type="number" id="res-coins" value="0" onchange="saveResources()" style="color: var(--accent-gold);">
             </div>
-            <div style="display: flex; align-items: center; gap: 5px;" title="Wisdom Cubes">
+            <div class="res-item" title="Wisdom Cubes">
                 <span>🧊</span>
-                <input type="number" id="res-cubes" value="0" onchange="saveResources()" style="width: 50px; background: transparent; border: none; color: var(--accent-cyan); font-weight: bold; text-align: right; outline: none;">
+                <input type="number" id="res-cubes" value="0" onchange="saveResources()" style="color: var(--accent-cyan);">
             </div>
         </div>
 
         <div style="display: flex; gap: 20px; align-items: center;">
-            <span class="api-status" id="api-status">● System Online</span>
-            <a href="https://ko-fi.com/YOUR_USERNAME_HERE" target="_blank" class="support-btn">☕ Support Dev</a>
+            <span id="api-status" style="font-size: 14px; color: var(--success);">● System Online</span>
+            <a href="https://ko-fi.com/" target="_blank" class="support-btn">☕ Support Dev</a>
             <button onclick="logout()" style="background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 6px 15px; border-radius: 20px; cursor: pointer;">Logout</button>
         </div>
     </div>
@@ -98,100 +91,30 @@
             <button class="tab-btn active" onclick="switchTab('tab-command', this)">Command Center</button>
             <button class="tab-btn" onclick="switchTab('tab-shipyard', this)">Global Shipyard</button>
             <button class="tab-btn" onclick="switchTab('tab-engineering', this)">Engineering Bay</button>
-            <button class="tab-btn" onclick="switchTab('tab-logistics', this)">Logistics (Farming)</button>
+            <button class="tab-btn" onclick="switchTab('tab-logistics', this)">Logistics</button>
         </div>
 
         <div id="tab-command" class="tab-content active">
-            <div class="commander-banner">
-                <div>
-                    <div style="font-size: 13px; color: var(--text-muted); text-transform: uppercase;">Overall Fleet Power</div>
-                    <div class="stat-value" id="total-fleet-power">0</div>
-                </div>
-                <div style="text-align: right;">
-                    <div>Total Ships: <b id="total-ships-count" style="color: var(--accent-cyan);">0</b></div>
-                    <div style="margin-top: 5px;">Oaths 💍: <b id="total-oath-count" style="color: #ff6363;">0</b></div>
-                </div>
-            </div>
-
-            <div class="panel" style="border-left: 4px solid var(--accent-gold);">
-                <h3 class="panel-title" style="color: var(--accent-gold);">⭐ Active Broadcast Fleet</h3>
-                <div id="fleet-container" style="display: flex; flex-wrap: wrap; gap: 15px; min-height: 80px;">
-                    <p style="color: var(--text-muted); margin: auto;">No ships assigned.</p>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                <h2 style="margin: 0;">Personal Dock</h2>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <label style="margin: 0; font-size: 12px;">Sort By:</label>
-                    <select id="dockSortFilter" onchange="sortMyDock()" style="width: auto; min-width: 140px;">
-                        <option value="newest">Newest Added</option>
-                        <option value="level">Highest Level</option>
-                        <option value="power">Highest Power</option>
-                        <option value="rarity">Rarity (UR to Rare)</option>
-                    </select>
-                    <button onclick="fetchMyDock()" style="background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); padding: 6px 15px; border-radius: 4px; cursor: pointer;">↻ Refresh</button>
-                </div>
-            </div>
             <div id="dock-container" class="grid-container"></div>
         </div>
 
         <div id="tab-shipyard" class="tab-content">
             <div class="panel">
-                <h3 class="panel-title">Database Search & Filters</h3>
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <input type="text" id="libSearch" placeholder="🔍 Search by name..." onkeyup="filterLibrary()" style="flex-grow: 1;">
-                    <select id="filterFaction" onchange="filterLibrary()" style="width: auto;">
+                    <input type="text" id="libSearch" placeholder="🔍 Search name..." onkeyup="filterLibrary()" style="flex-grow: 1; padding: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px;">
+                    <select id="filterFaction" onchange="filterLibrary()" style="width: auto; padding: 10px; background: #0f172a; color: white; border-radius: 6px;">
                         <option value="all">All Factions</option>
-                        <option value="Eagle Union">Eagle Union</option>
-                        <option value="Royal Navy">Royal Navy</option>
-                        <option value="Sakura Empire">Sakura Empire</option>
-                        <option value="Iron Blood">Iron Blood</option>
-                        <option value="META">META</option>
-                        <option value="Universal">Universal / Collab</option>
-                    </select>
-                    <select id="filterHull" onchange="filterLibrary()" style="width: auto;">
-                        <option value="all">All Hull Types</option>
-                        <option value="Destroyer">Destroyer</option>
-                        <option value="Light Cruiser">Light Cruiser</option>
-                        <option value="Heavy Cruiser">Heavy Cruiser</option>
-                        <option value="Battleship">Battleship</option>
-                        <option value="Aircraft Carrier">Carrier</option>
+                        <option value="eagle union">Eagle Union</option>
+                        <option value="royal navy">Royal Navy</option>
+                        <option value="sakura empire">Sakura Empire</option>
+                        <option value="iron blood">Iron Blood</option>
                     </select>
                 </div>
             </div>
-            <div id="global-library" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px;"></div>
+            <div id="global-library" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;"></div>
         </div>
 
-        <div id="tab-engineering" class="tab-content">
-            <div class="eng-grid">
-                <div class="panel" style="border-top: 4px solid #c38dff;">
-                    <h3 class="panel-title">Forge Equipment</h3>
-                    <div class="input-group"><label>Name</label><input type="text" id="equipName"></div>
-                    <div class="input-group"><label>Category</label><select id="equipCategory"><option value="Main Gun">Main Gun</option><option value="Auxiliary">Auxiliary</option></select></div>
-                    <button class="action-btn" onclick="createEquipmentAPI()" style="background-color:#c38dff; color:white;">Forge</button>
-                </div>
-                <div class="panel" style="border-top: 4px solid var(--accent-cyan);">
-                    <h3 class="panel-title">Armory Assignment</h3>
-                    <div class="input-group"><label>Ship</label><select id="equipDockId"></select></div>
-                    <div class="input-group"><label>Gear</label><select id="equipGearId"></select></div>
-                    <button class="action-btn" onclick="equipGearAPI()">Assign</button>
-                </div>
-            </div>
         </div>
-
-        <div id="tab-logistics" class="tab-content">
-            <div class="panel" style="border-top: 4px solid var(--accent-gold);">
-                <h3 class="panel-title">Cognitive Awakening Calculator</h3>
-                <div class="eng-grid">
-                    <div class="input-group"><label>Ship</label><select id="calcDockId"></select></div>
-                    <div class="input-group"><label>Target</label><select id="calcTargetLevel"><option value="120">Lv. 120</option><option value="125">Lv. 125</option></select></div>
-                </div>
-                <button class="action-btn" onclick="calculateAwakening()" style="background: var(--accent-gold); color: black;">Calculate</button>
-                <div id="calcResults" style="display: none; margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px;"></div>
-            </div>
-        </div>
-    </div>
 
     <script>
         const API_URL = "https://astranova-api.onrender.com"; 
@@ -200,7 +123,6 @@
 
         let allShipsInDB = []; 
         let currentDockData = []; 
-        let activeFleetIds = JSON.parse(localStorage.getItem('astra_active_fleet')) || []; 
 
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -211,92 +133,59 @@
 
         async function fetchMyDock() {
             try {
-                const response = await fetch(`${API_URL}/collection/me`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const ships = await response.json();
-                currentDockData = ships; 
-                renderShips(ships);
-                renderFleet(); 
-                
-                // Update dropdowns
-                const dockSelect = document.getElementById('equipDockId');
-                dockSelect.innerHTML = "";
-                ships.forEach(item => {
-                    dockSelect.innerHTML += `<option value="${item.id}">${item.ship.name} (Lv. ${item.level})</option>`;
-                });
-                document.getElementById('calcDockId').innerHTML = dockSelect.innerHTML;
-                
-                document.getElementById('api-status').style.color = "var(--success)";
-            } catch (error) { document.getElementById('api-status').style.color = "var(--danger)"; }
+                const res = await fetch(`${API_URL}/collection/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+                currentDockData = await res.json();
+                renderDock();
+            } catch (e) { console.error(e); }
         }
 
-        function sortMyDock() {
-            const sortBy = document.getElementById('dockSortFilter').value;
-            let sortedData = [...currentDockData];
-            const rarityScore = { "Ultra Rare": 4, "Super Rare": 3, "Elite": 2, "Rare": 1, "Common": 0 };
-            sortedData.sort((a, b) => {
-                if (sortBy === 'level') return b.level - a.level;
-                if (sortBy === 'rarity') return (rarityScore[b.ship.rarity] || 0) - (rarityScore[a.ship.rarity] || 0);
-                return b.id - a.id;
-            });
-            renderShips(sortedData);
-        }
-
-        function renderShips(shipsToRender) {
+        function renderDock() {
             const container = document.getElementById('dock-container');
             container.innerHTML = "";
-            shipsToRender.forEach(item => {
-                const img = item.ship.icon_url !== "null" ? item.ship.icon_url : 'https://placehold.co/100';
+            currentDockData.forEach(item => {
+                // Fixed Image Logic: Handle actual nulls
+                const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/100x100/1e293b/00f2fe?text=?';
                 const card = document.createElement('div');
                 card.className = `ship-card rarity-${item.ship.rarity.replace(/\s+/g, '')}`;
-                card.innerHTML = `
-                    <img src="${img}">
-                    <div>
-                        <h3 style="margin:0">${item.ship.name}</h3>
-                        <div style="font-size:12px; color:var(--accent-cyan)">Lv. ${item.level}</div>
-                        <button onclick="toggleFleet(${item.id})" style="font-size:10px; margin-top:5px; cursor:pointer">⭐ Assign</button>
-                    </div>`;
+                card.innerHTML = `<img src="${img}"><div><h3 style="margin:0">${item.ship.name}</h3><div style="color:var(--accent-cyan)">Lv. ${item.level}</div></div>`;
                 container.appendChild(card);
             });
         }
 
-        function toggleFleet(id) {
-            if (activeFleetIds.includes(id)) activeFleetIds = activeFleetIds.filter(f => f !== id);
-            else if (activeFleetIds.length < 6) activeFleetIds.push(id);
-            localStorage.setItem('astra_active_fleet', JSON.stringify(activeFleetIds));
-            renderFleet();
-        }
-
-        function renderFleet() {
-            const container = document.getElementById('fleet-container');
-            container.innerHTML = activeFleetIds.length ? "" : "No ships assigned.";
-            activeFleetIds.forEach(id => {
-                const item = currentDockData.find(s => s.id === id);
-                if (item) {
-                    const div = document.createElement('div');
-                    div.innerHTML = `<div style="padding:5px; border:1px solid gold; border-radius:4px">${item.ship.name}</div>`;
-                    container.appendChild(div);
-                }
-            });
-        }
-
         async function fetchGlobalLibrary() {
-            const res = await fetch(`${API_URL}/ships/`);
-            allShipsInDB = await res.json();
             const container = document.getElementById('global-library');
-            container.innerHTML = "";
-            allShipsInDB.forEach(ship => {
-                const div = document.createElement('div');
-                div.className = "global-card";
-                div.setAttribute('data-name', ship.name.toLowerCase());
-                div.innerHTML = `<div style="background:var(--bg-panel); padding:10px; border-radius:8px">${ship.name} <br><button onclick="quickAdd(${ship.id})">+ Add</button></div>`;
-                container.appendChild(div);
-            });
+            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--accent-cyan); animation: pulse 1.5s infinite;">📡 SYNCHRONIZING DATABASE...</div>`;
+            
+            try {
+                const res = await fetch(`${API_URL}/ships/`);
+                allShipsInDB = await res.json();
+                container.innerHTML = "";
+                
+                allShipsInDB.forEach(ship => {
+                    const img = (ship.icon_url && ship.icon_url !== "null") ? ship.icon_url : 'https://placehold.co/100x100/1e293b/00f2fe?text=?';
+                    const div = document.createElement('div');
+                    div.className = "global-card";
+                    div.setAttribute('data-name', ship.name.toLowerCase());
+                    div.setAttribute('data-faction', ship.faction.toLowerCase());
+                    div.innerHTML = `
+                        <div style="background:var(--bg-panel); padding:10px; border-radius:8px; text-align:center; border:1px solid var(--border-color);">
+                            <img src="${img}" style="width:60px; height:60px; border-radius:8px; object-fit:cover;">
+                            <div style="font-size:12px; font-weight:bold; margin-top:5px; white-space:nowrap; overflow:hidden;">${ship.name}</div>
+                            <button onclick="quickAdd(${ship.id})" style="width:100%; margin-top:5px; background:var(--success); border:none; border-radius:4px; cursor:pointer;">+ Add</button>
+                        </div>`;
+                    container.appendChild(div);
+                });
+            } catch (e) { container.innerHTML = "Offline."; }
         }
 
         function filterLibrary() {
             const term = document.getElementById('libSearch').value.toLowerCase();
+            const faction = document.getElementById('filterFaction').value.toLowerCase();
+            
             document.querySelectorAll('.global-card').forEach(card => {
-                card.style.display = card.getAttribute('data-name').includes(term) ? "block" : "none";
+                const nameMatch = card.getAttribute('data-name').includes(term);
+                const factionMatch = faction === 'all' || card.getAttribute('data-faction').includes(faction);
+                card.style.display = (nameMatch && factionMatch) ? "block" : "none";
             });
         }
 
@@ -308,18 +197,6 @@
             });
             fetchMyDock();
             switchTab('tab-command', document.querySelector('.tab-btn'));
-        }
-
-        function calculateAwakening() {
-            const shipId = document.getElementById('calcDockId').value;
-            const target = parseInt(document.getElementById('calcTargetLevel').value);
-            const ship = currentDockData.find(s => s.id == shipId);
-            if (!ship || ship.level >= target) return alert("Select a valid target!");
-            
-            let coins = (target - ship.level) * 500; // Simplified math for example
-            const resDiv = document.getElementById('calcResults');
-            resDiv.style.display = "block";
-            resDiv.innerHTML = `<h4>Target: Lv.${target}</h4><p>Estimated Coins: ${coins}</p>`;
         }
 
         function saveResources() {
