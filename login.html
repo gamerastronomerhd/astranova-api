@@ -1,40 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>AstraNova Login</title>
+    <meta charset="UTF-8">
+    <title>AstraNova - Login</title>
     <style>
-        body { background: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-box { background: #1e1e1e; padding: 40px; border-radius: 10px; border: 1px solid #333; }
-        input { display: block; width: 100%; margin: 10px 0; padding: 10px; background: #2a2a2a; color: white; border: 1px solid #444; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #ffffff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background-color: #1e1e1e; padding: 40px; border-radius: 8px; border: 1px solid #444; width: 300px; text-align: center; box-shadow: 0 4px 15px rgba(0, 230, 118, 0.2); }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid #555; background-color: #2a2a2a; color: white; box-sizing: border-box; }
+        button { background-color: #00e676; color: #000; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 4px; font-weight: bold; margin-top: 10px; }
+        .btn-secondary { background-color: #444; color: white; margin-top: 5px; }
+        #message { margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="login-box">
-        <h2>Commander Login</h2>
-        <input type="text" id="username" placeholder="Username">
+        <h2 style="color: #00e676; margin-top: 0;">AstraNova Terminal</h2>
+        <input type="text" id="username" placeholder="Commander Name">
         <input type="password" id="password" placeholder="Password">
-        <button onclick="handleLogin()">Login</button>
+        
+        <button onclick="login()">Initialize Uplink (Login)</button>
+        <button class="btn-secondary" onclick="register()">Create Account</button>
+        
+        <p id="message"></p>
     </div>
 
     <script>
-        async function handleLogin() {
-            const formData = new FormData();
-            formData.append('username', document.getElementById('username').value);
-            formData.append('password', document.getElementById('password').value);
+        // CHANGE THIS TO YOUR RENDER URL BEFORE UPLOADING TO GITHUB
+        const API_URL = "https://astranova-api.onrender.com"; 
 
-            const response = await fetch('https://astranova-api.onrender.com/token', {
-                method: 'POST',
-                body: formData
-            });
+        async function register() {
+            const form = new URLSearchParams();
+            const un = document.getElementById('username').value;
+            const pw = document.getElementById('password').value;
 
-            if (response.ok) {
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: un, password: pw })
+                });
+
                 const data = await response.json();
-                // SAVE THE TOKEN in the browser's memory
-                localStorage.setItem('astra_token', data.access_token);
-                window.location.href = 'dashboard.html'; // Go to the fleet
-            } else {
-                alert("Login Failed!");
+                const msg = document.getElementById('message');
+                if (response.ok) {
+                    msg.style.color = '#00e676';
+                    msg.innerText = data.message;
+                } else {
+                    msg.style.color = '#ff4444';
+                    msg.innerText = data.detail;
+                }
+            } catch (error) {
+                document.getElementById('message').innerText = "Network Error.";
+            }
+        }
+
+        async function login() {
+            const form = new URLSearchParams();
+            form.append('username', document.getElementById('username').value);
+            form.append('password', document.getElementById('password').value);
+
+            try {
+                const response = await fetch(`${API_URL}/token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: form
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('astra_token', data.access_token);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    const msg = document.getElementById('message');
+                    msg.style.color = '#ff4444';
+                    msg.innerText = "Access Denied: Invalid credentials.";
+                }
+            } catch (error) {
+                document.getElementById('message').innerText = "Network Error.";
             }
         }
     </script>

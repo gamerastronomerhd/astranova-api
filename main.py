@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel
 
 # --- SECURITY CONFIG ---
 # It will look for a secure cloud variable, but fall back to the string for local testing
@@ -65,8 +66,31 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="AstraNova API",
     description="Backend engine for the GamerAstronomer completionist database.",
-    version="1.1.2"
+    version="1.2.1"
 )
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+@app.post("/register")
+def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    # Check if user already exists
+    existing_user = db.query(models.User).filter(models.User.username == user.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Commander name already registered.")
+    
+    # Hash the password and create the user
+    hashed_password = pwd_context.hash(user.password)
+    new_user = models.User(username=user.username, hashed_password=hashed_password)
+    
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    return {"message": f"Welcome to AstraNova, Commander {new_user.username}! You can now log in."}
 
 @app.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
