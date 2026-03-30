@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AstraNova Login</title>
+    <style>
+        body { background: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-box { background: #1e1e1e; padding: 40px; border-radius: 10px; border: 1px solid #333; }
+        input { display: block; width: 100%; margin: 10px 0; padding: 10px; background: #2a2a2a; color: white; border: 1px solid #444; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Commander Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="handleLogin()">Login</button>
+    </div>
+
+    <script>
+        async function handleLogin() {
+            const formData = new FormData();
+            formData.append('username', document.getElementById('username').value);
+            formData.append('password', document.getElementById('password').value);
+
+            const response = await fetch('https://astranova-api.onrender.com/token', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // SAVE THE TOKEN in the browser's memory
+                localStorage.setItem('astra_token', data.access_token);
+                window.location.href = 'dashboard.html'; // Go to the fleet
+            } else {
+                alert("Login Failed!");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AstraNova Command Center</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #ffffff; padding: 40px; max-width: 800px; margin: 0 auto; }
+        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; }
+        
+        /* Form Styling */
+        .control-panel { background-color: #1e1e1e; border: 1px solid #444; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #aaa; font-size: 14px; }
+        input[type="number"], input[type="text"] { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #555; background-color: #2a2a2a; color: white; box-sizing: border-box; }
+        
+        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; width: 100%; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        .btn-success { background-color: #28a745; margin-bottom: 20px; }
+
+        /* Card Styling */
+        .ship-card { background-color: #1e1e1e; border: 1px solid #333; padding: 20px; margin-bottom: 15px; border-radius: 8px; display: flex; gap: 20px; align-items: center; }
+        .ship-card img { width: 80px; height: 80px; border-radius: 4px; object-fit: cover; }
+        
+        /* Rarity Border Colors */
+        .rarity-SuperRare { border: 2px solid #eecc55 !important; box-shadow: 0 0 10px #eecc5544; }
+        .rarity-Elite { border: 2px solid #c38dff !important; box-shadow: 0 0 10px #c38dff44; }
+        .rarity-UltraRare { border: 2px solid #ff6363 !important; box-shadow: 0 0 15px #ff636366; }
+        .rarity-Rare { border: 2px solid #4fc3f7 !important; }
+
+        .oath-badge { color: #ff6363; font-weight: bold; font-size: 0.9em; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>AstraNova Database</h1>
+    <p id="api-status">📡 System: <span style="color: #4caf50;">Online</span></p>
+    
+    <button onclick="logout()" style="background: #ff4444; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-bottom: 20px; width: auto;">
+        Secure Logout
+    </button>
+
+    <div style="background: linear-gradient(45deg, #ff69b4, #ff8c00); padding: 15px; border-radius: 8px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);">
+        <div>
+            <h3 style="margin: 0; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">🚀 AstraNova Alpha v0.1 is Live!</h3>
+            <p style="margin: 5px 0 0 0; color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">If this tool helps you manage your fleet, consider buying the dev an energy drink to fund future updates!</p>
+        </div>
+        <div>
+            <a href="https://ko-fi.com/gamerastronomer" target="_blank" style="background-color: #fff; color: #ff69b4; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 20px; display: inline-block; transition: transform 0.2s;">
+                ☕ Support the Developer
+            </a>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <h2 style="margin-top: 0;">Add Ship to Dock</h2>
+        
+        <div class="input-group">
+            <label for="shipId">Database ID (e.g., 1 for Enterprise)</label>
+            <input type="number" id="shipId" value="1">
+        </div>
+        
+        <div class="input-group">
+            <label for="shipLevel">Current Level</label>
+            <input type="number" id="shipLevel" value="1" min="1" max="125">
+        </div>
+        
+        <div class="input-group">
+            <label for="shipAffection">Affection</label>
+            <input type="number" id="shipAffection" value="50" min="0" max="200">
+        </div>
+        
+        <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="shipOathed" style="width: 20px; height: 20px;">
+            <label for="shipOathed" style="margin: 0; color: white; font-size: 16px;">Oathed 💍</label>
+        </div>
+
+        <p id="statusMessage" style="color: #00e676; font-size: 14px; display: none; margin-bottom: 10px;"></p>
+        <button onclick="addShipToAPI()">Transmit Data</button>
+    </div>
+
+    <div class="control-panel" style="border-left: 4px solid #c38dff;">
+        <h2 style="margin-top: 0; color: #c38dff;">Engineering Bay (Create Gear)</h2>
+        
+        <div class="input-group">
+            <label for="equipName">Gear Name (e.g., Twin 127mm MK12)</label>
+            <input type="text" id="equipName" placeholder="Enter gear name...">
+        </div>
+        
+        <div class="input-group">
+            <label for="equipCategory">Category</label>
+            <select id="equipCategory" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #555; background-color: #2a2a2a; color: white;">
+                <option value="Main Gun">Main Gun</option>
+                <option value="Secondary Gun">Secondary Gun</option>
+                <option value="Torpedo">Torpedo</option>
+                <option value="Fighter">Fighter</option>
+                <option value="Dive Bomber">Dive Bomber</option>
+                <option value="Torpedo Bomber">Torpedo Bomber</option>
+                <option value="Anti-Air Gun">Anti-Air Gun</option>
+                <option value="Auxiliary">Auxiliary</option>
+                <option value="Submarine Torpedo">Submarine Torpedo</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="equipRarity">Rarity</label>
+            <select id="equipRarity" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #555; background-color: #2a2a2a; color: white;">
+                <option value="Rare">Rare</option>
+                <option value="Elite">Elite</option>
+                <option value="Super Rare" selected>Super Rare</option>
+                <option value="Ultra Rare">Ultra Rare</option>
+            </select>
+        </div>
+
+        <button onclick="createEquipmentAPI()" style="background-color: #c38dff; color: #000;">Forge Equipment</button>
+        <p id="equipStatusMsg" style="color: #00e676; font-size: 14px; display: none; margin-top: 10px;"></p>
+    </div>
+
+    <div class="control-panel" style="border-left: 4px solid #4fc3f7;">
+        <h2 style="margin-top: 0; color: #4fc3f7;">Armory Assignment (Equip Gear)</h2>
+        
+        <div class="input-group">
+            <label for="equipDockId">1. Select Ship (From Your Dock)</label>
+            <select id="equipDockId" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #555; background-color: #2a2a2a; color: white;"></select>
+        </div>
+        
+        <div class="input-group">
+            <label for="equipSlotNum">2. Select Slot</label>
+            <select id="equipSlotNum" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #555; background-color: #2a2a2a; color: white;">
+                <option value="1">Slot 1 (Main Gun / Fighter / Sub Torp)</option>
+                <option value="2">Slot 2 (Torpedo / Dive Bomber / Sec. Gun)</option>
+                <option value="3">Slot 3 (Anti-Air / Torp Bomber)</option>
+                <option value="4">Slot 4 (Auxiliary)</option>
+                <option value="5">Slot 5 (Auxiliary)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="equipGearId">3. Select Gear (From Database)</label>
+            <select id="equipGearId" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #555; background-color: #2a2a2a; color: white;"></select>
+        </div>
+
+        <button onclick="equipGearAPI()" style="background-color: #4fc3f7; color: #000;">Assign Gear</button>
+        <p id="assignStatusMsg" style="color: #00e676; font-size: 14px; display: none; margin-top: 10px;"></p>
+    </div>
+
+    <h2 style="margin-top: 50px; border-bottom: 1px solid #444;">Global Ship Library</h2>
+    <div class="input-group">
+        <input type="text" id="libSearch" placeholder="🔍 Search Library (e.g. Enterprise)..." onkeyup="filterLibrary()" style="padding: 12px; margin-bottom: 15px;">
+    </div>
+    <div id="global-library" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;"></div>
+    
+    <br><br>
+    
+    <h2 style="margin-top: 40px; border-bottom: 1px solid #444; color: #eecc55;">⭐ Active Broadcast Fleet</h2>
+    <div id="fleet-container" style="display: flex; gap: 15px; margin-bottom: 30px; min-height: 120px; background-color: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px dashed #555;">
+        <p style="color: #666; margin: auto;">No ships assigned to the active fleet. Click 'Assign' on a docked ship!</p>
+    </div>
+    
+    <button class="btn-success" onclick="fetchMyDock()">Load Personal Dock</button>
+    
+    <div id="commander-banner" style="background: linear-gradient(90deg, #1e1e1e, #2a2a2a); border: 1px solid #444; border-left: 4px solid #00e676; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <div style="font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;">Overall Fleet Power</div>
+            <div id="total-fleet-power" style="font-size: 28px; font-weight: bold; color: #fff;">0</div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 14px; color: #aaa;">Total Ships: <b id="total-ships-count" style="color: white;">0</b></div>
+            <div style="font-size: 14px; color: #aaa; margin-top: 5px;">Oaths 💍: <b id="total-oath-count" style="color: #ff6363;">0</b></div>
+        </div>
+    </div>
+    
+    <div id="dock-container"></div>
+
+    <script>
+        const token = localStorage.getItem('astra_token');
+        if (!token) { window.location.href = 'login.html'; }
+
+        let allShipsInDB = []; 
+        let currentDockData = []; // NEW: Needed for fleet builder
+        let activeFleetIds = JSON.parse(localStorage.getItem('astra_active_fleet')) || []; // NEW: Memory for fleet
+
+        async function fetchMyDock() {
+            try {
+                const response = await fetch('https://astranova-api.onrender.com/collection/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error("Unauthorized");
+                const ships = await response.json();
+                
+                currentDockData = ships; // Save for the fleet builder
+                
+                renderShips(ships);
+                renderFleet(); // Draw the fleet
+                
+                // Update the Dropdown for Equipping Gear
+                const dockSelect = document.getElementById('equipDockId');
+                dockSelect.innerHTML = "";
+                ships.forEach(item => {
+                    dockSelect.innerHTML += `<option value="${item.id}">${item.ship.name} (Lv. ${item.level})</option>`;
+                });
+                
+                document.getElementById('api-status').innerHTML = "📡 System: <span style='color: #00e676;'>Online</span>";
+            } catch (error) {
+                document.getElementById('api-status').innerHTML = "📡 System: <span style='color: #ff4444;'>Offline</span>";
+            }
+        }
+
+        async function addShipToAPI() {
+            const payload = {
+                ship_id: parseInt(document.getElementById('shipId').value),
+                level: parseInt(document.getElementById('shipLevel').value),
+                affection: parseInt(document.getElementById('shipAffection').value),
+                is_oathed: document.getElementById('shipOathed').checked
+            };
+
+            const response = await fetch('https://astranova-api.onrender.com/collection/', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) { fetchMyDock(); } 
+            else { alert("API Error. Check console."); }
+        }
+
+        async function createEquipmentAPI() {
+            const payload = {
+                name: document.getElementById('equipName').value,
+                category: document.getElementById('equipCategory').value,
+                rarity: document.getElementById('equipRarity').value,
+                icon_url: "null"
+            };
+
+            try {
+                const response = await fetch('https://astranova-api.onrender.com/equipment/', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const newGear = await response.json();
+                    const statusText = document.getElementById('equipStatusMsg');
+                    statusText.style.display = 'block';
+                    statusText.innerHTML = `✅ Successfully forged: <b>${newGear.name}</b> (Database ID: ${newGear.id})`;
+                    document.getElementById('equipName').value = "";
+                    
+                    fetchAllEquipment(); // Refresh gear dropdown!
+                } else {
+                    alert("Failed to create equipment. Check API console.");
+                }
+            } catch (error) {
+                console.error("Network error:", error);
+            }
+        }
+
+        async function equipGearAPI() {
+            const collectionId = document.getElementById('equipDockId').value;
+            const slotNum = document.getElementById('equipSlotNum').value;
+            const gearId = document.getElementById('equipGearId').value;
+
+            try {
+                const response = await fetch(`https://astranova-api.onrender.com/collection/${collectionId}/equip/${slotNum}?equipment_id=${gearId}`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const msgDiv = document.getElementById('assignStatusMsg');
+                    msgDiv.style.display = 'block';
+                    msgDiv.style.color = '#00e676';
+                    msgDiv.innerText = "✅ " + result.message;
+                    fetchMyDock(); 
+                } else {
+                    const errorData = await response.json();
+                    const msgDiv = document.getElementById('assignStatusMsg');
+                    msgDiv.style.display = 'block';
+                    msgDiv.style.color = '#ff4444';
+                    msgDiv.innerText = "❌ " + errorData.detail;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function renderShips(shipsToRender) {
+            const container = document.getElementById('dock-container');
+            container.innerHTML = "";
+
+            // --- Commander Banner Math ---
+            let totalPower = 0;
+            let totalOaths = 0;
+
+            shipsToRender.forEach(item => {
+                if (item.is_oathed) totalOaths++;
+                const stats = item.calculated_stats;
+                if (stats) {
+                    totalPower += (stats.hp + stats.fp + stats.aa); 
+                }
+            });
+
+            document.getElementById('total-ships-count').innerText = shipsToRender.length;
+            document.getElementById('total-oath-count').innerText = totalOaths;
+            document.getElementById('total-fleet-power').innerText = totalPower.toLocaleString();
+            // ----------------------------------
+
+            shipsToRender.forEach(item => {
+                const rarityClass = "rarity-" + item.ship.rarity.replace(/\s+/g, '');
+                const cleanName = item.ship.name.replace(/\s+/g, '_');
+                const img = item.ship.icon_url && item.ship.icon_url !== "null" 
+                    ? item.ship.icon_url 
+                    : `https://azurlane.koumakan.jp/wiki/Special:FilePath/${cleanName}Icon.png`;
+                
+                const slots = [item.eq1, item.eq2, item.eq3, item.eq4, item.eq5];
+                let gearHtml = '<div style="margin-top: 10px; border-top: 1px solid #444; padding-top: 5px;">';
+                slots.forEach((eq, i) => {
+                    const name = eq ? eq.name : `<span style="color: #555;">Empty Slot ${i+1}</span>`;
+                    gearHtml += `<div style="font-size: 11px;">🛠️ ${name}</div>`;
+                });
+                gearHtml += '</div>';
+
+                const s = item.calculated_stats || {hp: 0, fp: 0, aa: 0};
+                let statsHtml = `
+                    <div style="display: flex; gap: 10px; font-size: 12px; margin-top: 5px; color: #aaa;">
+                        <span>❤️ <b style="color:white">${s.hp}</b></span>
+                        <span>⚔️ <b style="color:white">${s.fp}</b></span>
+                        <span>🛡️ <b style="color:white">${s.aa}</b></span>
+                    </div>`;
+
+                const card = document.createElement('div');
+                card.className = `ship-card ${rarityClass}`;
+                card.innerHTML = `
+                    <img src="${img}" onerror="this.src='https://placehold.co/100x100/1e1e1e/00e676?text=${item.ship.name}'">
+                    <div style="flex-grow: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <h3 style="margin: 0;">${item.ship.name}</h3>
+                            <div>
+                                <button onclick="toggleFleet(${item.id})" style="width: auto; background: #eecc55; color: #000; font-size: 10px; padding: 2px 8px; margin: 0; margin-right: 5px;">⭐ Assign</button>
+                                <button onclick="retireShip(${item.id})" style="width: auto; background: #444; font-size: 10px; padding: 2px 8px; margin: 0;">Retire</button>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #888;">${item.ship.faction} | ${item.ship.hull_type}</div>
+                        ${statsHtml}
+                        <div style="font-size: 14px; margin-top: 5px; color: #00e676;">Lv. ${item.level}</div>
+                        ${item.is_oathed ? "<div class='oath-badge'>💍 Oathed</div>" : ""}
+                        ${gearHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleFleet(collectionId) {
+            if (activeFleetIds.includes(collectionId)) {
+                activeFleetIds = activeFleetIds.filter(id => id !== collectionId);
+            } else {
+                if (activeFleetIds.length >= 6) {
+                    alert("Fleet is full! Maximum 6 ships.");
+                    return;
+                }
+                activeFleetIds.push(collectionId);
+            }
+            localStorage.setItem('astra_active_fleet', JSON.stringify(activeFleetIds));
+            renderFleet();
+        }
+
+        function renderFleet() {
+            const container = document.getElementById('fleet-container');
+            if (activeFleetIds.length === 0) {
+                container.innerHTML = '<p style="color: #666; margin: auto;">No ships assigned to the active fleet. Click ⭐ Assign on a docked ship!</p>';
+                return;
+            }
+
+            container.innerHTML = ""; 
+            activeFleetIds.forEach(id => {
+                const item = currentDockData.find(ship => ship.id === id);
+                if (item) {
+                    const cleanName = item.ship.name.replace(/\s+/g, '_');
+                    const img = item.ship.icon_url && item.ship.icon_url !== "null" 
+                        ? item.ship.icon_url 
+                        : `https://azurlane.koumakan.jp/wiki/Special:FilePath/${cleanName}Icon.png`;
+
+                    const div = document.createElement('div');
+                    div.style = "background: #1e1e1e; padding: 10px; border-radius: 8px; text-align: center; border: 2px solid #eecc55; width: 100px;";
+                    div.innerHTML = `
+                        <img src="${img}" style="width: 60px; height: 60px; border-radius: 4px; object-fit: cover; margin-bottom: 5px;" onerror="this.src='https://placehold.co/60x60/1e1e1e/00e676?text=?'">
+                        <div style="font-weight: bold; color: #fff; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.ship.name}</div>
+                        <div style="font-size: 10px; color: #00e676;">Lv. ${item.level}</div>
+                        <button onclick="toggleFleet(${item.id})" style="margin-top: 5px; background: #ff4444; padding: 2px 5px; font-size: 9px; width: 100%; color: white; border: none; cursor: pointer; border-radius: 3px;">Remove</button>
+                    `;
+                    container.appendChild(div);
+                }
+            });
+        }
+
+        async function fetchGlobalLibrary() {
+            const response = await fetch('https://astranova-api.onrender.com/ships/');
+            allShipsInDB = await response.json(); 
+            const container = document.getElementById('global-library');
+            container.innerHTML = "";
+
+            allShipsInDB.forEach(ship => {
+                const cleanName = ship.name.replace(/\s+/g, '_');
+                const img = ship.icon_url && ship.icon_url !== "null" ? ship.icon_url : `https://azurlane.koumakan.jp/wiki/Special:FilePath/${cleanName}Icon.png`;
+
+                const div = document.createElement('div');
+                div.className = "global-card"; 
+                div.style = "background: #1e1e1e; padding: 10px; border-radius: 5px; text-align: center; border: 1px solid #333;";
+                div.innerHTML = `
+                    <img src="${img}" style="width: 50px; height: 50px; border-radius: 4px; object-fit: cover; margin-bottom: 5px;" onerror="this.src='https://placehold.co/50x50/1e1e1e/00e676?text=?'">
+                    <div style="font-weight: bold; color: #00e676; font-size: 14px;">${ship.name}</div>
+                    <div style="font-size: 10px; color: #888;">ID: ${ship.id} | ${ship.faction}</div>
+                    <button onclick="quickAdd(${ship.id})" style="padding: 5px; font-size: 10px; margin-top: 10px; background: #28a745; width: 100%;">
+                        Add ID ${ship.id} to Dock
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+            updateLivePreview();
+        }
+
+        function filterLibrary() {
+            const term = document.getElementById('libSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.global-card');
+            cards.forEach(card => {
+                const nameText = card.innerText.toLowerCase();
+                card.style.display = nameText.includes(term) ? "block" : "none";
+            });
+        }
+
+        function quickAdd(id) {
+            document.getElementById('shipId').value = id;
+            updateLivePreview(); 
+            addShipToAPI();
+        }
+
+        async function retireShip(collectionId) {
+            if (!confirm("Are you sure you want to retire this ship?")) return;
+            const response = await fetch(`https://astranova-api.onrender.com/collection/${collectionId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) { fetchMyDock(); }
+        }
+        
+        ['shipId', 'shipLevel', 'shipAffection', 'shipOathed'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateLivePreview);
+        });
+
+        function updateLivePreview() {
+            const selectedId = parseInt(document.getElementById('shipId').value);
+            const level = parseInt(document.getElementById('shipLevel').value) || 1;
+            const affection = parseInt(document.getElementById('shipAffection').value) || 50;
+            const isOathed = document.getElementById('shipOathed').checked;
+
+            const ship = allShipsInDB.find(s => s.id === selectedId);
+            
+            if (ship && ship.stats) {
+                const growth = 1 + (level - 1) * 0.02;
+                let bonus = 1.0;
+                if (isOathed) bonus = 1.12;
+                else if (affection >= 100) bonus = 1.06;
+
+                const liveHp = Math.floor(ship.stats.health * growth * bonus);
+                const liveFp = Math.floor(ship.stats.firepower * growth * bonus);
+
+                document.getElementById('statusMessage').style.display = 'block';
+                document.getElementById('statusMessage').innerHTML = 
+                    `Live Preview: ❤️ <b>${liveHp}</b> HP | ⚔️ <b>${liveFp}</b> FP`;
+            } else {
+                document.getElementById('statusMessage').style.display = 'none';
+            }
+        }
+
+        async function fetchAllEquipment() {
+            const response = await fetch('https://astranova-api.onrender.com/equipment/');
+            const allEquipment = await response.json();
+            
+            const gearSelect = document.getElementById('equipGearId');
+            gearSelect.innerHTML = "";
+            allEquipment.forEach(gear => {
+                gearSelect.innerHTML += `<option value="${gear.id}">${gear.name} (${gear.category})</option>`;
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('astra_token');
+            window.location.href = 'login.html';
+        }
+
+        // Kickoff calls
+        fetchGlobalLibrary();
+        fetchMyDock();
+        fetchAllEquipment();
+    </script>
+</body>
+</html>
