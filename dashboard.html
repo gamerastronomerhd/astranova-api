@@ -84,10 +84,11 @@
 
     <div class="tab-container">
         
-        <div class="tabs">
+<div class="tabs">
             <button class="tab-btn active" onclick="switchTab('tab-command', this)">Command Center</button>
             <button class="tab-btn" onclick="switchTab('tab-shipyard', this)">Global Shipyard</button>
             <button class="tab-btn" onclick="switchTab('tab-engineering', this)">Engineering Bay</button>
+            <button class="tab-btn" onclick="switchTab('tab-logistics', this)">Logistics (Farming)</button>
         </div>
 
         <div id="tab-command" class="tab-content active">
@@ -242,6 +243,35 @@
         </div>
     </div>
 
+<div id="tab-logistics" class="tab-content">
+            <div class="panel" style="border-top: 4px solid var(--accent-gold);">
+                <h3 class="panel-title" style="color: var(--accent-gold);">Cognitive Awakening Calculator</h3>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: -10px; margin-bottom: 20px;">Calculate the exact resources required to uncap your ships to Level 125.</p>
+                
+                <div class="eng-grid">
+                    <div class="input-group">
+                        <label>1. Select Docked Ship</label>
+                        <select id="calcDockId"></select>
+                    </div>
+                    <div class="input-group">
+                        <label>2. Target Level</label>
+                        <select id="calcTargetLevel">
+                            <option value="105">Level 105</option>
+                            <option value="110">Level 110</option>
+                            <option value="115">Level 115</option>
+                            <option value="120" selected>Level 120</option>
+                            <option value="125">Level 125</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="action-btn" onclick="calculateAwakening()" style="background-color: var(--accent-gold); color: #000; margin-top: 10px;">Calculate Required Materials</button>
+
+                <div id="calcResults" style="display: none; margin-top: 25px; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 8px; border-left: 4px solid var(--accent-gold);">
+                    </div>
+            </div>
+        </div>
+
     <script>
         // CHANGE THIS TO YOUR RENDER URL
         const API_URL = "https://astranova-api.onrender.com"; 
@@ -274,18 +304,23 @@
                 renderFleet(); 
                 
                 const dockSelect = document.getElementById('equipDockId');
-                dockSelect.innerHTML = "";
-                ships.forEach(item => {
-                    dockSelect.innerHTML += `<option value="${item.id}">${item.ship.name} (Lv. ${item.level})</option>`;
-                });
-                
-                document.getElementById('api-status').innerHTML = "● System Online";
-                document.getElementById('api-status').style.color = "var(--success)";
-            } catch (error) {
-                document.getElementById('api-status').innerHTML = "● System Offline";
-                document.getElementById('api-status').style.color = "var(--danger)";
-            }
-        }
+        dockSelect.innerHTML = "";
+        
+        // 1. First, we build the list of ships
+        ships.forEach(item => {
+            dockSelect.innerHTML += `<option value="${item.id}">${item.ship.name} (Lv. ${item.level})</option>`;
+        });
+        
+        // 2. THEN, we copy the finished list over to the calculator!
+        document.getElementById('calcDockId').innerHTML = dockSelect.innerHTML;
+        
+        document.getElementById('api-status').innerHTML = "● System Online";
+        document.getElementById('api-status').style.color = "var(--success)";
+    } catch (error) {
+        document.getElementById('api-status').innerHTML = "● System Offline";
+        document.getElementById('api-status').style.color = "var(--danger)";
+    }
+}
 
         async function addShipToAPI() {
             const payload = {
@@ -583,6 +618,56 @@
         fetchGlobalLibrary();
         fetchMyDock();
         fetchAllEquipment();
+		
+function calculateAwakening() {
+            const shipId = document.getElementById('calcDockId').value;
+            const targetLvl = parseInt(document.getElementById('calcTargetLevel').value);
+            const ship = currentDockData.find(s => s.id == shipId);
+
+            if (!ship) return;
+            let currentLvl = ship.level;
+            
+            if (currentLvl >= targetLvl) {
+                alert(`Commander, ${ship.ship.name} is already at or above Level ${targetLvl}!`);
+                return;
+            }
+
+            let coins = 0; let chips = 0; let arrays = 0;
+
+            // Standard SSR/UR Awakening Logic
+            if (currentLvl < 105 && targetLvl >= 105) { coins += 3000; chips += 100; }
+            if (currentLvl < 110 && targetLvl >= 110) { coins += 5000; chips += 200; }
+            if (currentLvl < 115 && targetLvl >= 115) { coins += 8000; chips += 300; }
+            if (currentLvl < 120 && targetLvl >= 120) { coins += 10000; chips += 400; }
+            if (currentLvl < 125 && targetLvl >= 125) { coins += 15000; chips += 500; arrays += 50; }
+
+            const resDiv = document.getElementById('calcResults');
+            resDiv.style.display = "block";
+            resDiv.innerHTML = `
+                <h4 style="margin-top:0; color: white;">Awakening Plan: <span style="color: var(--accent-gold);">${ship.ship.name}</span> (Lv.${currentLvl} ➔ Lv.${targetLvl})</h4>
+                <div style="display: flex; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                    
+                    <div style="background: #0f172a; padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #334155;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">🪙</div>
+                        <div style="font-weight: bold; color: #fbbf24; font-size: 18px;">${coins.toLocaleString()}</div>
+                        <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Coins</div>
+                    </div>
+                    
+                    <div style="background: #0f172a; padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #334155;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">🧬</div>
+                        <div style="font-weight: bold; color: var(--accent-cyan); font-size: 18px;">${chips.toLocaleString()}</div>
+                        <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Cognitive Chips</div>
+                    </div>
+                    
+                    <div style="background: #0f172a; padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #334155;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">💠</div>
+                        <div style="font-weight: bold; color: #c38dff; font-size: 18px;">${arrays.toLocaleString()}</div>
+                        <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Cognitive Arrays</div>
+                    </div>
+
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>

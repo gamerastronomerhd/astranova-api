@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AstraNova OBS Overlay</title>
+    <style>
+        /* Transparent Background for OBS */
+        body { margin: 0; padding: 20px; font-family: 'Segoe UI', system-ui, sans-serif; background-color: transparent; color: white; overflow: hidden; }
+        
+        /* Sci-Fi Glassmorphism Panel */
+        .overlay-panel { background: rgba(11, 15, 25, 0.85); border: 1px solid #1e293b; border-left: 4px solid #00f2fe; padding: 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(8px); display: inline-block; min-width: 300px; }
+        
+        /* Setup Login Form */
+        #setup-mode { display: flex; flex-direction: column; gap: 10px; }
+        input { background: #0f172a; border: 1px solid #334155; color: white; padding: 8px; border-radius: 4px; }
+        button { background: #00f2fe; color: black; border: none; padding: 8px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        
+        /* Live Broadcast View */
+        #live-mode { display: none; }
+        .header { font-size: 14px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; margin-bottom: 5px; }
+        .power-value { font-size: 32px; font-weight: bold; color: white; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); margin-bottom: 15px; }
+        
+        .ship-list { display: flex; gap: 10px; }
+        .ship-mini { text-align: center; width: 60px; }
+        .ship-mini img { width: 50px; height: 50px; border-radius: 6px; border: 1px solid #334155; object-fit: cover; }
+        .ship-mini .lvl { font-size: 11px; color: #22c55e; font-weight: bold; margin-top: 3px; }
+    </style>
+</head>
+<body>
+
+    <div class="overlay-panel">
+        
+        <div id="setup-mode">
+            <div class="header">OBS Authenticator</div>
+            <input type="text" id="obs-user" placeholder="Commander Name">
+            <input type="password" id="obs-pass" placeholder="Password">
+            <button onclick="authenticateOBS()">Link to AstraNova Cloud</button>
+            <div id="obs-msg" style="color: #ef4444; font-size: 12px; margin-top: 5px;"></div>
+        </div>
+
+        <div id="live-mode">
+            <div class="header">AstraNova Live Uplink</div>
+            <div class="power-value" id="overlay-power">0</div>
+            <div class="ship-list" id="overlay-ships">
+                </div>
+        </div>
+
+    </div>
+
+    <script>
+        // CHANGE THIS TO YOUR RENDER URL
+        const API_URL = "https://astranova-api.onrender.com"; 
+
+        async function authenticateOBS() {
+            const form = new URLSearchParams();
+            form.append('username', document.getElementById('obs-user').value);
+            form.append('password', document.getElementById('obs-pass').value);
+
+            try {
+                const response = await fetch(`${API_URL}/token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: form
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('astra_obs_token', data.access_token);
+                    startBroadcast();
+                } else {
+                    document.getElementById('obs-msg').innerText = "Access Denied.";
+                }
+            } catch (e) { document.getElementById('obs-msg').innerText = "Network Error."; }
+        }
+
+        async function fetchFleetData() {
+            const token = localStorage.getItem('astra_obs_token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_URL}/collection/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const ships = await response.json();
+                    
+                    let totalPower = 0;
+                    // Calculate power and sort ships by strongest first
+                    ships.forEach(item => {
+                        const stats = item.calculated_stats;
+                        if (stats) {
+                            item.total_power = stats.hp + stats.fp + stats.aa;
+                            totalPower += item.total_power;
+                        } else {
+                            item.total_power = 0;
+                        }
+                    });
+
+                    // Sort highest power to lowest and grab top 6
+                    ships.sort((a, b) => b.total_power - a.total_power);
+                    const topShips = ships.slice(0, 6);
+
+                    // Update UI
+                    document.getElementById('overlay-power').innerText = "PWR: " + totalPower.toLocaleString();
+                    
+                    const container = document.getElementById('overlay-ships');
+                    container.innerHTML = "";
+                    topShips.forEach(item => {
+                        const img = item.ship.icon_url && item.ship.icon_url !== "null" ? item.ship.icon_url : `https://placehold.co/50x50/1e293b/00f2fe?text=?`;
+                        container.innerHTML += `
+                            <div class="ship-mini">
+                                <img src="${img}">
+                                <div class="lvl">Lv.${item.level}</div>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (error) { console.error("OBS Fetch failed", error); }
+        }
+
+        function startBroadcast() {
+            const token = localStorage.getItem('astra_obs_token');
+            if (token) {
+                document.getElementById('setup-mode').style.display = "none";
+                document.getElementById('live-mode').style.display = "block";
+                fetchFleetData();
+                // Refresh data every 60 seconds automatically
+                setInterval(fetchFleetData, 60000); 
+            }
+        }
+
+        // Auto-start if already logged in
+        startBroadcast();
+    </script>
+</body>
+</html>
