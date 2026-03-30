@@ -120,8 +120,38 @@
 
         <div id="tab-shipyard" class="tab-content">
             <div class="panel">
-                <h3 class="panel-title">Database Search</h3>
-                <input type="text" id="libSearch" placeholder="🔍 Search ships by name to add to your dock..." onkeyup="filterLibrary()" style="padding: 15px; font-size: 16px;">
+                <h3 class="panel-title">Database Search & Filters</h3>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <input type="text" id="libSearch" placeholder="🔍 Search by name..." onkeyup="filterLibrary()" style="flex-grow: 1; min-width: 200px;">
+                    
+                    <select id="filterFaction" onchange="filterLibrary()" style="width: auto; min-width: 150px;">
+                        <option value="all">All Factions</option>
+                        <option value="Eagle Union">Eagle Union</option>
+                        <option value="Royal Navy">Royal Navy</option>
+                        <option value="Sakura Empire">Sakura Empire</option>
+                        <option value="Iron Blood">Iron Blood</option>
+                        <option value="Dragon Empery">Dragon Empery</option>
+                        <option value="Sardegna Empire">Sardegna Empire</option>
+                        <option value="Northern Parliament">Northern Parliament</option>
+                        <option value="Iris Libre">Iris Libre</option>
+                        <option value="Vichya Dominion">Vichya Dominion</option>
+                        <option value="META">META</option>
+                        <option value="Universal">Universal / Collab</option>
+                    </select>
+
+                    <select id="filterHull" onchange="filterLibrary()" style="width: auto; min-width: 150px;">
+                        <option value="all">All Hull Types</option>
+                        <option value="Destroyer">Destroyer</option>
+                        <option value="Light Cruiser">Light Cruiser</option>
+                        <option value="Heavy Cruiser">Heavy Cruiser</option>
+                        <option value="Battleship">Battleship / Battlecruiser</option>
+                        <option value="Aircraft Carrier">Aircraft Carrier</option>
+                        <option value="Light Aircraft Carrier">Light Carrier</option>
+                        <option value="Submarine">Submarine</option>
+                        <option value="Repair">Repair Ship</option>
+                    </select>
+                </div>
             </div>
             <div id="global-library" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px;"></div>
         </div>
@@ -432,15 +462,20 @@
                 div.onmouseover = function() { this.style.borderColor = "var(--accent-cyan)"; }
                 div.onmouseout = function() { this.style.borderColor = "var(--border-color)"; }
                 
+                // We add hidden data attributes to make filtering super fast
+                div.className = "global-card";
+                div.setAttribute('data-faction', ship.faction.toLowerCase());
+                div.setAttribute('data-hull', ship.hull_type.toLowerCase());
+                div.setAttribute('data-name', ship.name.toLowerCase());
+                
                 div.innerHTML = `
                     <img src="${img}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; margin-bottom: 8px; border: 1px solid #334155;" onerror="this.src='https://placehold.co/60x60/1e293b/00f2fe?text=?'">
-                    <div style="font-weight: bold; color: white; font-size: 13px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ship.name}</div>
-                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 10px;">ID: ${ship.id} | ${ship.hull_type}</div>
+                    <div style="font-weight: bold; color: white; font-size: 13px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${ship.name}">${ship.name}</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 10px;">${ship.faction} | ${ship.hull_type}</div>
                     <button onclick="quickAdd(${ship.id})" style="padding: 6px; font-size: 11px; background: rgba(34, 197, 94, 0.2); color: var(--success); border: 1px solid var(--success); width: 100%; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                         + Quick Add
                     </button>
                 `;
-                div.className = "global-card";
                 container.appendChild(div);
             });
             updateLivePreview();
@@ -448,10 +483,38 @@
 
         function filterLibrary() {
             const term = document.getElementById('libSearch').value.toLowerCase();
+            const factionFilter = document.getElementById('filterFaction').value.toLowerCase();
+            const hullFilter = document.getElementById('filterHull').value.toLowerCase();
+            
             const cards = document.querySelectorAll('.global-card');
+            
             cards.forEach(card => {
-                const nameText = card.innerText.toLowerCase();
-                card.style.display = nameText.includes(term) ? "block" : "none";
+                const shipName = card.getAttribute('data-name');
+                const shipFaction = card.getAttribute('data-faction');
+                const shipHull = card.getAttribute('data-hull');
+
+                // Check text search
+                const matchesName = shipName.includes(term);
+                
+                // Check faction dropdown (treat Universal/Collab differently if needed, but 'all' catches everything)
+                const matchesFaction = factionFilter === 'all' || shipFaction.includes(factionFilter) || (factionFilter === 'universal' && !shipFaction.includes('empire') && !shipFaction.includes('union') && !shipFaction.includes('navy') && !shipFaction.includes('blood') && !shipFaction.includes('parliament') && !shipFaction.includes('dominion') && !shipFaction.includes('libre'));
+                
+                // Check hull dropdown (grouping BBs and BCs)
+                let matchesHull = false;
+                if (hullFilter === 'all') {
+                    matchesHull = true;
+                } else if (hullFilter === 'battleship') {
+                    matchesHull = shipHull.includes('battleship') || shipHull.includes('battlecruiser') || shipHull.includes('aviation battleship');
+                } else {
+                    matchesHull = shipHull.includes(hullFilter);
+                }
+
+                // Show only if ALL criteria match
+                if (matchesName && matchesFaction && matchesHull) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
             });
         }
 
