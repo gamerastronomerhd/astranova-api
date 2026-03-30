@@ -2,83 +2,255 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AstraNova - Login</title>
+    <title>AstraNova | Secure Uplink</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #ffffff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background-color: #1e1e1e; padding: 40px; border-radius: 8px; border: 1px solid #444; width: 300px; text-align: center; box-shadow: 0 4px 15px rgba(0, 230, 118, 0.2); }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid #555; background-color: #2a2a2a; color: white; box-sizing: border-box; }
-        button { background-color: #00e676; color: #000; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 4px; font-weight: bold; margin-top: 10px; }
-        .btn-secondary { background-color: #444; color: white; margin-top: 5px; }
-        #message { margin-top: 15px; font-size: 14px; }
+        :root {
+            --bg-void: #0b0f19;
+            --accent-cyan: #00f2fe;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-void);
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(18, 24, 38, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(18, 24, 38, 0.5) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background: rgba(21, 30, 46, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #1e293b;
+            border-top: 4px solid var(--accent-cyan);
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .logo h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .logo h1 span { color: var(--accent-cyan); }
+
+        .status-tag {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 2px rgba(0, 242, 254, 0.1);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-cyan);
+            color: #0b0f19;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background: #00d2f0;
+            transform: translateY(-1px);
+        }
+
+        .toggle-text {
+            margin-top: 25px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .toggle-text a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #error-msg {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 15px;
+            min-height: 18px;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-top-color: #0b0f19;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2 style="color: #00e676; margin-top: 0;">AstraNova Terminal</h2>
-        <input type="text" id="username" placeholder="Commander Name">
-        <input type="password" id="password" placeholder="Password">
-        
-        <button onclick="login()">Initialize Uplink (Login)</button>
-        <button class="btn-secondary" onclick="register()">Create Account</button>
-        
-        <p id="message"></p>
+
+    <div class="login-card">
+        <div class="logo">
+            <h1>Astra<span>Nova</span></h1>
+            <span class="status-tag">Fleet Data Protocol v2.0</span>
+        </div>
+
+        <div id="login-form">
+            <div class="input-group">
+                <label>Commander Identifier</label>
+                <input type="text" id="user" placeholder="Enter username...">
+            </div>
+            <div class="input-group">
+                <label>Security Key</label>
+                <input type="password" id="pass" placeholder="••••••••">
+            </div>
+            
+            <button class="btn-primary" onclick="handleAuth('login')">
+                <span id="btn-text">Establish Link</span>
+                <div id="spinner" class="loading-spinner"></div>
+            </button>
+        </div>
+
+        <div id="error-msg"></div>
+
+        <div class="toggle-text">
+            <span id="toggle-msg">New Commander?</span> 
+            <a id="toggle-link" onclick="toggleView()">Register Credentials</a>
+        </div>
     </div>
 
     <script>
-        // CHANGE THIS TO YOUR RENDER URL BEFORE UPLOADING TO GITHUB
-        const API_URL = "https://astranova-api.onrender.com"; 
+        const API_URL = "https://astranova-api.onrender.com";
+        let isLogin = true;
 
-        async function register() {
-            const form = new URLSearchParams();
-            const un = document.getElementById('username').value;
-            const pw = document.getElementById('password').value;
+        function toggleView() {
+            isLogin = !isLogin;
+            document.getElementById('btn-text').innerText = isLogin ? 'Establish Link' : 'Register Commander';
+            document.getElementById('toggle-msg').innerText = isLogin ? 'New Commander?' : 'Already Registered?';
+            document.getElementById('toggle-link').innerText = isLogin ? 'Register Credentials' : 'Return to Login';
+            document.getElementById('error-msg').innerText = '';
+        }
+
+        async function handleAuth() {
+            const user = document.getElementById('user').value;
+            const pass = document.getElementById('pass').value;
+            const errorDiv = document.getElementById('error-msg');
+            const btnText = document.getElementById('btn-text');
+            const spinner = document.getElementById('spinner');
+
+            if(!user || !pass) {
+                errorDiv.innerText = "Fields cannot be empty.";
+                return;
+            }
+
+            // UI Feedback
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            errorDiv.innerText = "";
 
             try {
-                const response = await fetch(`${API_URL}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: un, password: pw })
-                });
+                if (isLogin) {
+                    const form = new URLSearchParams();
+                    form.append('username', user);
+                    form.append('password', pass);
 
-                const data = await response.json();
-                const msg = document.getElementById('message');
-                if (response.ok) {
-                    msg.style.color = '#00e676';
-                    msg.innerText = data.message;
+                    const res = await fetch(`${API_URL}/token`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: form
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        localStorage.setItem('astra_token', data.access_token);
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        errorDiv.innerText = "Invalid credentials.";
+                    }
                 } else {
-                    msg.style.color = '#ff4444';
-                    msg.innerText = data.detail;
+                    const res = await fetch(`${API_URL}/users/`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: user, password: pass })
+                    });
+
+                    if (res.ok) {
+                        alert("Commander Registered. You may now link.");
+                        toggleView();
+                    } else {
+                        const data = await res.json();
+                        errorDiv.innerText = data.detail || "Registration failed.";
+                    }
                 }
-            } catch (error) {
-                document.getElementById('message').innerText = "Network Error.";
+            } catch (err) {
+                errorDiv.innerText = "Connection lost. Check API status.";
+            } finally {
+                btnText.style.display = 'block';
+                spinner.style.display = 'none';
             }
         }
 
-        async function login() {
-            const form = new URLSearchParams();
-            form.append('username', document.getElementById('username').value);
-            form.append('password', document.getElementById('password').value);
-
-            try {
-                const response = await fetch(`${API_URL}/token`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: form
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('astra_token', data.access_token);
-                    window.location.href = 'dashboard.html';
-                } else {
-                    const msg = document.getElementById('message');
-                    msg.style.color = '#ff4444';
-                    msg.innerText = "Access Denied: Invalid credentials.";
-                }
-            } catch (error) {
-                document.getElementById('message').innerText = "Network Error.";
-            }
-        }
+        // Enter key support
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleAuth();
+        });
     </script>
 </body>
 </html>
