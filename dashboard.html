@@ -72,9 +72,13 @@
                     <p style="color: var(--text-muted); margin: auto;">No ships assigned.</p>
                 </div>
             </div>
-			<div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
-				<button onclick="bulkRetireCommons()" style="background:rgba(239, 68, 68, 0.1); color:var(--danger); border:1px solid var(--danger); padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:bold;">🗑️ Bulk Retire Commons</button>
-		</div>
+			<div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h3 style="margin:0; color:var(--accent-cyan)">Personal Dock</h3>
+    <button onclick="bulkRetireCommons()" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;">
+        🗑️ Bulk Retire Commons
+    </button>
+</div>
+
             <div id="dock-container" class="grid-container"></div>
         </div>
 
@@ -263,70 +267,83 @@ function renderDock() {
 
 		let displayedCount = 40; // Only show 40 at a time initially
 
+let shipyardBatch = 30; 
+        let currentDisplayCount = 30;
+
+        // Optimized Global Library Fetch
         async function fetchGlobalLibrary() {
             const container = document.getElementById('global-library');
-            container.innerHTML = `<div id="loading-signal" style="grid-column: 1/-1; text-align: center; padding:40px; color: var(--accent-cyan); font-weight:bold; animation: pulse 1.5s infinite;">📡 SYNCHRONIZING DATABASE...</div>`;
+            container.innerHTML = `<div id="loading-msg" style="grid-column: 1/-1; text-align: center; color: var(--accent-cyan); animation: pulse 1.5s infinite;">📡 WAKING UP SERVER... PLEASE WAIT</div>`;
             
             try {
                 const res = await fetch(`${API_URL}/ships/`);
-                if (!res.ok) throw new Error("API Offline");
+                if (!res.ok) throw new Error("Server Booting");
                 allShipsInDB = await res.json();
-                renderLibrary(); // Call a separate render function
+                renderShipyard(true); // Initial render
             } catch (err) {
-                container.innerHTML = `<div style="grid-column: 1/-1; color: var(--danger); text-align:center;">⚠️ Link failed. Please check if your Render server is active.</div>`;
+                container.innerHTML = `<div style="grid-column: 1/-1; color: var(--danger); text-align:center;">⚠️ Link failed. Open <a href="${API_URL}/ships/" target="_blank" style="color:white">this link</a> once to wake the server, then refresh.</div>`;
             }
         }
 
-        function renderLibrary() {
+        function renderShipyard(reset = false) {
+            if (reset) currentDisplayCount = shipyardBatch;
             const container = document.getElementById('global-library');
             const term = document.getElementById('libSearch').value.toLowerCase();
             const faction = document.getElementById('filterFaction').value.toLowerCase();
 
-            // Filter the full list first
+            // Filter the master list
             const filtered = allShipsInDB.filter(ship => {
                 const nameMatch = ship.name.toLowerCase().includes(term);
                 const factionMatch = faction === 'all' || ship.faction.toLowerCase().includes(faction);
                 return nameMatch && factionMatch;
             });
 
-            // Only render the first 'displayedCount' ships
-            const toShow = filtered.slice(0, displayedCount);
+            // Slice for Lazy Loading
+            const toDisplay = filtered.slice(0, currentDisplayCount);
             
-            container.innerHTML = toShow.map(ship => `
+            container.innerHTML = toDisplay.map(ship => `
                 <div class="global-card">
                     <div style="background:var(--bg-panel); padding:10px; border-radius:8px; text-align:center; border:1px solid var(--border-color)">
                         <img src="${ship.icon_url}" loading="lazy" style="width:60px; height:60px; border-radius:8px; object-fit:cover; margin-bottom:5px;">
                         <div style="font-size:12px; font-weight:bold; overflow:hidden; white-space:nowrap;">${ship.name}</div>
-                        <button onclick="quickAdd(${ship.id})" style="width:100%; padding:6px; font-size:11px; background:rgba(34, 197, 94, 0.2); color:var(--success); border:1px solid var(--success); border-radius:4px; cursor:pointer;">+ Add</button>
+                        <button onclick="quickAdd(${ship.id})" style="width:100%; margin-top:5px; padding:6px; font-size:11px; background:rgba(34, 197, 94, 0.2); color:var(--success); border:1px solid var(--success); border-radius:4px; cursor:pointer;">+ Add</button>
                     </div>
                 </div>
             `).join('');
-
-            // Add a "Load More" trigger if needed
-            if (displayedCount < filtered.length) {
-                container.innerHTML += `<div id="load-more-trigger" style="grid-column: 1/-1; text-align:center; padding:20px; color:var(--text-muted)">Scrolling to load more...</div>`;
-            }
         }
 
-        // Detect scroll to load more ships
+        // Detect Scroll to Bottom
         window.onscroll = function() {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-                if (displayedCount < allShipsInDB.length) {
-                    displayedCount += 40;
-                    renderLibrary();
+                if (currentDisplayCount < allShipsInDB.length) {
+                    currentDisplayCount += shipyardBatch;
+                    renderShipyard();
                 }
             }
         };
 
+        // Improved Filter (Resets count)
         function filterLibrary() {
-            const term = document.getElementById('libSearch').value.toLowerCase();
-            const faction = document.getElementById('filterFaction').value.toLowerCase();
+            renderShipyard(true);
+        }
+
+        // NEW: Bulk Retire Logic
+        async function bulkRetireCommons() {
+            const commons = currentDockData.filter(item => item.ship.rarity === "Common" || item.ship.rarity === "Rare");
+            if (commons.length === 0) return alert("No Common/Rare ships found to retire.");
             
-            document.querySelectorAll('.global-card').forEach(card => {
-                const nameMatch = card.getAttribute('data-name').includes(term);
-                const factionMatch = faction === 'all' || card.getAttribute('data-faction').includes(faction);
-                card.style.display = (nameMatch && factionMatch) ? "block" : "none";
-            });
+            if (!confirm(`Commander, are you sure you want to retire ${commons.length} ships?`)) return;
+
+            // Use Promise.all to fire all deletes at once for speed
+            await Promise.all(commons.map(ship => 
+                fetch(`${API_URL}/collection/${ship.id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+            ));
+
+            alert("Retirement complete. Resources reclaimed.");
+            fetchMyDock();
         }
 
         async function quickAdd(id) {
