@@ -40,6 +40,20 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+		
+		/* View Toggle & Table Styles */
+        .view-toggle { display: flex; gap: 5px; background: #0f172a; padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .view-btn { background: transparent; color: var(--text-muted); border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
+        .view-btn.active { background: var(--bg-panel); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); box-shadow: 0 0 8px rgba(0, 242, 254, 0.2); }
+        
+        .dock-table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color); }
+        .dock-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; white-space: nowrap; }
+        .dock-table th { background: #0f172a; padding: 12px 8px; color: var(--accent-gold); border-bottom: 2px solid var(--border-color); font-weight: 600; letter-spacing: 0.5px;}
+        .dock-table td { padding: 8px; border-bottom: 1px solid var(--border-color); background: var(--bg-panel); vertical-align: middle; }
+        .dock-table tr:hover td { background: #1e293b; }
+        .td-ship { text-align: left; display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 13px; }
+        .td-ship img { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; border: 1px solid #334155; }
+        .stat-highlight { color: var(--accent-cyan); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -73,7 +87,13 @@
                 </div>
             </div>
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin:0; color:var(--accent-cyan)">Personal Dock</h3>
+                <div style="display:flex; align-items: center; gap: 20px;">
+                    <h3 style="margin:0; color:var(--accent-cyan)">Personal Dock</h3>
+                    <div class="view-toggle">
+                        <button class="view-btn active" id="btn-view-cards" onclick="setDockView('cards')">🎴 Cards</button>
+                        <button class="view-btn" id="btn-view-table" onclick="setDockView('table')">📋 Table</button>
+                    </div>
+                </div>
                 <button onclick="bulkRetireCommons()" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                     🗑️ Bulk Retire Commons
                 </button>
@@ -97,9 +117,9 @@
             <div id="global-library" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;"></div>
         </div>
 
-        <div id="tab-engineering" class="tab-content">
+<div id="tab-engineering" class="tab-content">
             <div class="panel">
-                <h3 style="color:var(--accent-cyan); margin-top:0;">Ship Modification</h3>
+                <h3 style="color:var(--accent-cyan); margin-top:0;">Ship Modification & Enhancement</h3>
                 <div class="eng-grid">
                     <div><label>Ship ID</label><input type="number" id="shipId" readonly style="background:#1e293b; color:#94a3b8;"></div>
                     <div><label>Level</label><input type="number" id="shipLevel" value="1"></div>
@@ -108,6 +128,17 @@
                         <input type="checkbox" id="shipOathed" style="width:20px"> <label style="margin:0">Oathed 💍</label>
                     </div>
                 </div>
+
+                <h4 style="color:var(--accent-gold); border-bottom:1px solid #334155; padding-bottom:5px; margin-top:25px;">Account Bonuses (Enhancement + Fleet Tech)</h4>
+                <p style="font-size:11px; color:var(--text-muted); margin-top:-5px;">Enter the "+ Green Numbers" shown in-game when no gear is equipped.</p>
+                <div class="eng-grid">
+                    <div><label>Bonus ❤️ HP</label><input type="number" id="bonusHp" value="0"></div>
+                    <div><label>Bonus ⚔️ FP</label><input type="number" id="bonusFp" value="0"></div>
+                    <div><label>Bonus 🛡️ AA</label><input type="number" id="bonusAa" value="0"></div>
+                    <div><label>Bonus ✈️ AVI</label><input type="number" id="bonusAvi" value="0"></div>
+                    <div><label>Bonus 🐟 TRP</label><input type="number" id="bonusTrp" value="0"></div>
+                </div>
+
                 <button class="action-btn" onclick="addShipToAPI()">Update Ship Data</button>
             </div>
         </div>
@@ -133,6 +164,7 @@
         let allShipsInDB = []; 
         let currentDockData = [];
         let activeFleetIds = JSON.parse(localStorage.getItem('astra_active_fleet')) || []; 
+		let currentDockView = 'cards';
 
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -155,67 +187,105 @@
             }
         }
 
-        function renderDock() {
+       function renderDock() {
             const container = document.getElementById('dock-container');
             container.innerHTML = "";
             
+            // If table view, set up the headers
+            if (currentDockView === 'table') {
+                container.className = "dock-table-wrapper";
+                container.innerHTML = `
+                    <table class="dock-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left">Ship</th>
+                                <th>Lv</th>
+                                <th>HP</th><th>FP</th><th>TRP</th><th>AVI</th><th>AA</th>
+                                <th>EVA</th><th>ACC</th><th>ASW</th>
+                                <th>SPD</th><th>LCK</th><th>ARMOR</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dock-tbody"></tbody>
+                    </table>`;
+            } else {
+                container.className = "grid-container";
+            }
+
+            const tbody = document.getElementById('dock-tbody');
+
             currentDockData.forEach(item => {
                 const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/100x100/1e293b/00f2fe?text=?';
-                
                 const s = item.ship.stats || {};
-                
-                // Base Stats (Lv 1)
-                const bHp = s.health ?? 200;
-                const bFp = s.firepower ?? 0;
-                const bAa = s.anti_air ?? 0;
-                const bAvi = s.aviation ?? 0;
-                const bTrp = s.torpedo ?? 0;
-
-                // Max Stats (Lv 120 Anchor)
-                const mHp = s.hp_120 ?? bHp;
-                const mFp = s.fp_120 ?? bFp;
-                const mAa = s.aa_120 ?? bAa;
-                const mAvi = s.avi_120 ?? bAvi;
-                const mTrp = s.trp_120 ?? bTrp;
-                
-                // True Azur Lane Scaling Formula: Base + (Max - Base) * ((Level - 1) / 119)
                 const scale = (item.level - 1) / 119;
                 
-                let affectionBonus = 1.0;
-                if (item.is_oathed) affectionBonus = 1.12;
-                else if (item.affection >= 100) affectionBonus = 1.06;
-                else if (item.affection >= 90) affectionBonus = 1.03;
+                let aff = 1.0;
+                if (item.is_oathed) aff = 1.12;
+                else if (item.affection >= 100) aff = 1.06;
+                else if (item.affection >= 90) aff = 1.03;
 
-                const finalHp = Math.floor((bHp + (mHp - bHp) * scale) * affectionBonus);
-                const finalFp = Math.floor((bFp + (mFp - bFp) * scale) * affectionBonus);
-                const finalAa = Math.floor((bAa + (mAa - bAa) * scale) * affectionBonus);
-                const finalAvi = Math.floor((bAvi + (mAvi - bAvi) * scale) * affectionBonus);
-                const finalTrp = Math.floor((bTrp + (mTrp - bTrp) * scale) * affectionBonus);
-                
-                // Dynamic Display formatting
-                let statDisplay = `❤️ ${finalHp.toLocaleString()}`;
-                if (finalFp > 0 || (finalAvi === 0 && finalTrp === 0)) statDisplay += ` | ⚔️ ${finalFp.toLocaleString()}`;
-                if (finalTrp > 0) statDisplay += ` | 🐟 ${finalTrp.toLocaleString()}`;
-                if (finalAvi > 0) statDisplay += ` | ✈️ ${finalAvi.toLocaleString()}`;
-                if (finalAa > 0) statDisplay += ` | 🛡️ ${finalAa.toLocaleString()}`;
+                // Main 5 Stats
+                const hp = Math.floor(((s.health ?? 200) + ((s.hp_120 ?? (s.health ?? 200)) - (s.health ?? 200)) * scale) * aff) + (item.bonus_hp || 0);
+                const fp = Math.floor(((s.firepower ?? 0) + ((s.fp_120 ?? (s.firepower ?? 0)) - (s.firepower ?? 0)) * scale) * aff) + (item.bonus_fp || 0);
+                const aa = Math.floor(((s.anti_air ?? 0) + ((s.aa_120 ?? (s.anti_air ?? 0)) - (s.anti_air ?? 0)) * scale) * aff) + (item.bonus_aa || 0);
+                const avi = Math.floor(((s.aviation ?? 0) + ((s.avi_120 ?? (s.aviation ?? 0)) - (s.aviation ?? 0)) * scale) * aff) + (item.bonus_avi || 0);
+                const trp = Math.floor(((s.torpedo ?? 0) + ((s.trp_120 ?? (s.torpedo ?? 0)) - (s.torpedo ?? 0)) * scale) * aff) + (item.bonus_trp || 0);
 
-                const card = document.createElement('div');
-                card.className = `ship-card rarity-${item.ship.rarity.replace(/\s+/g, '')}`;
-                card.innerHTML = `
-                    <img src="${img}">
-                    <div style="flex-grow:1">
-                        <h3 style="margin:0">${item.ship.name}</h3>
-                        <div style="font-size:12px; color:var(--accent-cyan)">Lv. ${item.level}</div>
-                        <div style="font-size:11px; margin-top:5px; color:var(--text-muted)">
-                            ${statDisplay}
-                        </div>
-                        <div style="display:flex; gap:5px; margin-top:8px;">
-                            <button onclick="editShip(${item.ship.id}, ${item.level}, ${item.affection}, ${item.is_oathed})" style="font-size:10px; cursor:pointer; background:#334155; color:white; border:none; border-radius:4px; padding:4px 8px;">🔧 Edit</button>
-                            <button onclick="toggleFleet(${item.id})" style="font-size:10px; cursor:pointer; background:var(--accent-gold); color:black; border:none; border-radius:4px; padding:4px 8px; font-weight:bold;">⭐ Assign</button>
-                            <button onclick="retireShip(${item.id})" style="font-size:10px; cursor:pointer; background:var(--danger); color:white; border:none; border-radius:4px; padding:4px 8px;">🗑️ Retire</button>
-                        </div>
-                    </div>`;
-                container.appendChild(card);
+                // Newly Scraped Stats (Evasion, Accuracy, ASW scale with level)
+                const eva = Math.floor(((s.evasion ?? 0) + ((s.evasion_120 ?? (s.evasion ?? 0)) - (s.evasion ?? 0)) * scale) * aff);
+                const acc = Math.floor(((s.accuracy ?? 0) + ((s.accuracy_120 ?? (s.accuracy ?? 0)) - (s.accuracy ?? 0)) * scale) * aff);
+                const asw = Math.floor(((s.anti_sub ?? 0) + ((s.anti_sub_120 ?? (s.anti_sub ?? 0)) - (s.anti_sub ?? 0)) * scale) * aff);
+
+                // Static Stats (Speed, Luck, Armor do not scale)
+                const spd = s.speed ?? 0;
+                const lck = s.luck ?? 0;
+                const armor = s.armor_type ?? 'Unknown';
+
+                if (currentDockView === 'cards') {
+                    // --- CARD RENDERING ---
+                    let statDisplay = `❤️ ${hp.toLocaleString()}`;
+                    if (fp > 0 || (avi === 0 && trp === 0)) statDisplay += ` | ⚔️ ${fp.toLocaleString()}`;
+                    if (trp > 0) statDisplay += ` | 🐟 ${trp.toLocaleString()}`;
+                    if (avi > 0) statDisplay += ` | ✈️ ${avi.toLocaleString()}`;
+                    if (aa > 0) statDisplay += ` | 🛡️ ${aa.toLocaleString()}`;
+
+                    const card = document.createElement('div');
+                    card.className = `ship-card rarity-${item.ship.rarity.replace(/\s+/g, '')}`;
+                    card.innerHTML = `
+                        <img src="${img}">
+                        <div style="flex-grow:1">
+                            <h3 style="margin:0">${item.ship.name}</h3>
+                            <div style="font-size:12px; color:var(--accent-cyan)">Lv. ${item.level}</div>
+                            <div style="font-size:11px; margin-top:5px; color:var(--text-muted)">${statDisplay}</div>
+                            <div style="display:flex; gap:5px; margin-top:8px;">
+                                <button onclick="editShip(${item.id})" style="font-size:10px; cursor:pointer; background:#334155; color:white; border:none; border-radius:4px; padding:4px 8px;">🔧 Edit</button>
+                                <button onclick="toggleFleet(${item.id})" style="font-size:10px; cursor:pointer; background:var(--accent-gold); color:black; border:none; border-radius:4px; padding:4px 8px; font-weight:bold;">⭐ Assign</button>
+                                <button onclick="retireShip(${item.id})" style="font-size:10px; cursor:pointer; background:var(--danger); color:white; border:none; border-radius:4px; padding:4px 8px;">🗑️ Retire</button>
+                            </div>
+                        </div>`;
+                    container.appendChild(card);
+                } else {
+                    // --- TABLE RENDERING ---
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="td-ship rarity-${item.ship.rarity.replace(/\s+/g, '')}" style="border-left: 3px solid; padding-left: 8px;">
+                            <img src="${img}">
+                            ${item.ship.name}
+                        </td>
+                        <td class="stat-highlight">${item.level}</td>
+                        <td>${hp}</td><td>${fp}</td><td>${trp}</td><td>${avi}</td><td>${aa}</td>
+                        <td style="color:#94a3b8">${eva}</td><td style="color:#94a3b8">${acc}</td><td style="color:#94a3b8">${asw}</td>
+                        <td>${spd}</td><td>${lck}</td><td style="text-transform:capitalize;">${armor}</td>
+                        <td>
+                            <div style="display:flex; gap:4px; justify-content:center;">
+                                <button onclick="editShip(${item.id})" style="cursor:pointer; background:#334155; color:white; border:none; border-radius:4px; padding:4px 6px;" title="Edit">🔧</button>
+                                <button onclick="toggleFleet(${item.id})" style="cursor:pointer; background:var(--accent-gold); color:black; border:none; border-radius:4px; padding:4px 6px;" title="Assign">⭐</button>
+                                <button onclick="retireShip(${item.id})" style="cursor:pointer; background:var(--danger); color:white; border:none; border-radius:4px; padding:4px 6px;" title="Retire">🗑️</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
             });
         }
 
@@ -254,21 +324,38 @@
             });
         }
 
-        function editShip(id, lvl, aff, oath) {
+        // Updated to pass the unique Collection ID and pull existing bonuses
+        function editShip(collectionId) {
+            const item = currentDockData.find(s => s.id === collectionId);
+            if (!item) return;
+            
             switchTab('tab-engineering', document.querySelectorAll('.tab-btn')[2]);
-            document.getElementById('shipId').value = id;
-            document.getElementById('shipLevel').value = lvl;
-            document.getElementById('shipAffection').value = aff;
-            document.getElementById('shipOathed').checked = oath;
+            // Notice we use item.ship_id here for the API, but display the data from the collection
+            document.getElementById('shipId').value = item.ship_id; 
+            document.getElementById('shipLevel').value = item.level;
+            document.getElementById('shipAffection').value = item.affection;
+            document.getElementById('shipOathed').checked = item.is_oathed;
+            
+            document.getElementById('bonusHp').value = item.bonus_hp || 0;
+            document.getElementById('bonusFp').value = item.bonus_fp || 0;
+            document.getElementById('bonusAa').value = item.bonus_aa || 0;
+            document.getElementById('bonusAvi').value = item.bonus_avi || 0;
+            document.getElementById('bonusTrp').value = item.bonus_trp || 0;
         }
 
-        async function addShipToAPI() {
+async function addShipToAPI() {
             const payload = {
                 ship_id: parseInt(document.getElementById('shipId').value),
                 level: parseInt(document.getElementById('shipLevel').value),
                 affection: parseInt(document.getElementById('shipAffection').value),
-                is_oathed: document.getElementById('shipOathed').checked
+                is_oathed: document.getElementById('shipOathed').checked,
+                bonus_hp: parseInt(document.getElementById('bonusHp').value) || 0,
+                bonus_fp: parseInt(document.getElementById('bonusFp').value) || 0,
+                bonus_aa: parseInt(document.getElementById('bonusAa').value) || 0,
+                bonus_avi: parseInt(document.getElementById('bonusAvi').value) || 0,
+                bonus_trp: parseInt(document.getElementById('bonusTrp').value) || 0
             };
+            
             await fetch(`${API_URL}/collection/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -458,6 +545,15 @@
         function logout() { localStorage.removeItem('astra_token'); window.location.href = 'login.html'; }
 
         loadResources(); fetchGlobalLibrary(); fetchMyDock();
+		
+		function setDockView(viewType) {
+            currentDockView = viewType;
+            document.getElementById('btn-view-cards').classList.toggle('active', viewType === 'cards');
+            document.getElementById('btn-view-table').classList.toggle('active', viewType === 'table');
+            renderDock(); // Re-render the dock with the new layout
+        }
+		
+		
     </script>
 </body>
 </html>
