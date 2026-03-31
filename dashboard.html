@@ -164,28 +164,35 @@
                 
                 const s = item.ship.stats || {};
                 
-                // Fixed Nullish coalescing (??) so 0 is accepted as a valid stat for carriers
-                const baseHp = s.health ?? 200;
-                const baseFp = s.firepower ?? 0;
-                const baseAa = s.anti_air ?? 0;
-                const baseAvi = s.aviation ?? 0;
-                const baseTrp = s.torpedo ?? 0;
+                // Base Stats (Lv 1)
+                const bHp = s.health ?? 200;
+                const bFp = s.firepower ?? 0;
+                const bAa = s.anti_air ?? 0;
+                const bAvi = s.aviation ?? 0;
+                const bTrp = s.torpedo ?? 0;
+
+                // Max Stats (Lv 120 Anchor)
+                const mHp = s.hp_120 ?? bHp;
+                const mFp = s.fp_120 ?? bFp;
+                const mAa = s.aa_120 ?? bAa;
+                const mAvi = s.avi_120 ?? bAvi;
+                const mTrp = s.trp_120 ?? bTrp;
                 
-                // Improved linear math multiplier (~4.8% per level is highly accurate for AL)
-                const levelMultiplier = 1 + ((item.level - 1) * 0.048);
+                // True Azur Lane Scaling Formula: Base + (Max - Base) * ((Level - 1) / 119)
+                const scale = (item.level - 1) / 119;
                 
                 let affectionBonus = 1.0;
                 if (item.is_oathed) affectionBonus = 1.12;
                 else if (item.affection >= 100) affectionBonus = 1.06;
                 else if (item.affection >= 90) affectionBonus = 1.03;
 
-                const finalHp = Math.floor(baseHp * levelMultiplier * affectionBonus);
-                const finalFp = Math.floor(baseFp * levelMultiplier * affectionBonus);
-                const finalAa = Math.floor(baseAa * levelMultiplier * affectionBonus);
-                const finalAvi = Math.floor(baseAvi * levelMultiplier * affectionBonus);
-                const finalTrp = Math.floor(baseTrp * levelMultiplier * affectionBonus);
+                const finalHp = Math.floor((bHp + (mHp - bHp) * scale) * affectionBonus);
+                const finalFp = Math.floor((bFp + (mFp - bFp) * scale) * affectionBonus);
+                const finalAa = Math.floor((bAa + (mAa - bAa) * scale) * affectionBonus);
+                const finalAvi = Math.floor((bAvi + (mAvi - bAvi) * scale) * affectionBonus);
+                const finalTrp = Math.floor((bTrp + (mTrp - bTrp) * scale) * affectionBonus);
                 
-                // Dynamically build the stat string so carriers show Aviation instead of 0 FP
+                // Dynamic Display formatting
                 let statDisplay = `❤️ ${finalHp.toLocaleString()}`;
                 if (finalFp > 0 || (finalAvi === 0 && finalTrp === 0)) statDisplay += ` | ⚔️ ${finalFp.toLocaleString()}`;
                 if (finalTrp > 0) statDisplay += ` | 🐟 ${finalTrp.toLocaleString()}`;
@@ -338,7 +345,7 @@
 
         async function bulkRetireCommons() {
             const commons = currentDockData.filter(item => 
-                item.ship.rarity && item.ship.rarity.toLowerCase() === "common"
+                item.ship.rarity && (item.ship.rarity.toLowerCase() === "common" || item.ship.rarity.toLowerCase() === "normal")
             );
 
             if (commons.length === 0) {
