@@ -585,28 +585,41 @@
 		
 		function calculateGlobalFleetTech() {
             let techTotals = { hp: 0, fp: 0, aa: 0, avi: 0, trp: 0, rld: 0 };
-            let countedShips = new Set(); // Ensures we only count each unique ship class ONCE
-
+            
+            // 1. Filter the dock to find the MAX level version of every unique ship
+            let highestLevels = {};
             currentDockData.forEach(item => {
-                // Check if ship is Lv 120+ and hasn't been counted yet
-                if (item.level >= 120 && !countedShips.has(item.ship_id)) {
-                    countedShips.add(item.ship_id);
-                    
-                    const statName = item.ship.stats?.tech_stat;
-                    const statVal = item.ship.stats?.tech_value || 0;
-
-                    if (statName) {
-                        if (statName === 'health' || statName === 'hp') techTotals.hp += statVal;
-                        else if (statName === 'firepower') techTotals.fp += statVal;
-                        else if (statName === 'antiair' || statName === 'anti-air') techTotals.aa += statVal;
-                        else if (statName === 'aviation') techTotals.avi += statVal;
-                        else if (statName === 'torpedo') techTotals.trp += statVal;
-                        else if (statName === 'reload') techTotals.rld += statVal;
-                    }
+                if (!highestLevels[item.ship_id] || item.level > highestLevels[item.ship_id].level) {
+                    highestLevels[item.ship_id] = { level: item.level, stats: item.ship.stats };
                 }
             });
 
-            // Render the results to the new dashboard panel
+            // 2. Apply the 3-Tier math to those unique ships
+            Object.values(highestLevels).forEach(shipData => {
+                const s = shipData.stats;
+                if (!s) return;
+
+                const applyStat = (statName, statVal) => {
+                    if (!statName || !statVal) return;
+                    if (statName === 'health' || statName === 'hp') techTotals.hp += statVal;
+                    else if (statName === 'firepower') techTotals.fp += statVal;
+                    else if (statName === 'antiair' || statName === 'anti-air') techTotals.aa += statVal;
+                    else if (statName === 'aviation') techTotals.avi += statVal;
+                    else if (statName === 'torpedo') techTotals.trp += statVal;
+                    else if (statName === 'reload') techTotals.rld += statVal;
+                };
+
+                // Tier 1: Collection Bonus (Always applied if you own the ship)
+                applyStat(s.get_stat, s.get_value);
+
+                // Tier 2: Max Limit Break Bonus (Lv 70+ proxy)
+                if (shipData.level >= 70) applyStat(s.mlb_stat, s.mlb_value);
+
+                // Tier 3: Level 120 Bonus
+                if (shipData.level >= 120) applyStat(s.lv120_stat, s.lv120_value);
+            });
+
+            // 3. Render the UI
             const display = document.getElementById('fleet-tech-display');
             display.innerHTML = `
                 <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">❤️ HP: <span style="color:white">+${techTotals.hp}</span></div>
@@ -616,6 +629,9 @@
                 <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">🐟 TRP: <span style="color:var(--accent-cyan)">+${techTotals.trp}</span></div>
                 <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">⏱️ RLD: <span style="color:var(--success)">+${techTotals.rld}</span></div>
             `;
+            
+            // Also update the UI label
+            document.querySelector('#tab-command .panel:nth-child(2) p').innerText = "Total Global Fleet Technology Synchronization";
             
             return techTotals;
         }
