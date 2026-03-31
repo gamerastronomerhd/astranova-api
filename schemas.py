@@ -35,6 +35,9 @@ class ShipStatsCreate(BaseModel):
     evasion_120: int | None = 0
     accuracy_120: int | None = 0
     anti_sub_120: int | None = 0
+    
+    tech_stat: str | None = None
+    tech_value: int | None = 0
 
 class ShipStats(ShipStatsCreate):
     id: int
@@ -106,8 +109,8 @@ class CollectionResponse(BaseModel):
     eq4: Optional[EquipmentResponse] = None
     eq5: Optional[EquipmentResponse] = None
 
-    class Config:
-        from_attributes = True
+class Config:
+    from_attributes = True
 
 # 4. USER SCHEMAS
 class UserCreate(BaseModel):
