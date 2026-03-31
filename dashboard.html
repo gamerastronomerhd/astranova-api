@@ -170,6 +170,7 @@
                         <div style="display:flex; gap:5px; margin-top:8px;">
                             <button onclick="editShip(${item.ship.id}, ${item.level}, ${item.affection}, ${item.is_oathed})" style="font-size:10px; cursor:pointer; background:#334155; color:white; border:none; border-radius:4px; padding:4px 8px;">🔧 Edit</button>
                             <button onclick="toggleFleet(${item.id})" style="font-size:10px; cursor:pointer; background:var(--accent-gold); color:black; border:none; border-radius:4px; padding:4px 8px; font-weight:bold;">⭐ Assign</button>
+                            <button onclick="retireShip(${item.id})" style="font-size:10px; cursor:pointer; background:var(--danger); color:white; border:none; border-radius:4px; padding:4px 8px;">🗑️ Retire</button>
                         </div>
                     </div>`;
                 container.appendChild(card);
@@ -368,6 +369,28 @@
         function logout() { localStorage.removeItem('astra_token'); window.location.href = 'login.html'; }
 
         loadResources(); fetchGlobalLibrary(); fetchMyDock();
+		
+		async function retireShip(collectionId) {
+            if (!confirm("Are you sure you want to retire this ship? This cannot be undone.")) return;
+            try {
+                const res = await fetch(`${API_URL}/collection/${collectionId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    // If the ship was in your active fleet, remove it from the banner too
+                    if (activeFleetIds.includes(collectionId)) {
+                        activeFleetIds = activeFleetIds.filter(id => id !== collectionId);
+                        localStorage.setItem('astra_active_fleet', JSON.stringify(activeFleetIds));
+                    }
+                    fetchMyDock(); // Refresh the dock UI
+                } else {
+                    alert("Failed to retire ship. Ensure API is online.");
+                }
+            } catch (error) {
+                console.error("Retire error:", error);
+            }
+        }
     </script>
 </body>
 </html>
