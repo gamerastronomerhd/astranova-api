@@ -66,7 +66,7 @@
             <div class="res-item"><span>🧊</span><input type="number" id="res-cubes" onchange="saveResources()" style="color:var(--accent-cyan)"></div>
         </div>
         <div>
-            <span id="api-status">● System Online</span>
+            <span id="api-status"> 🟢  System Online</span>
             <button onclick="logout()" style="margin-left:20px; background:transparent; border:1px solid var(--danger); color:var(--danger); padding:5px 15px; border-radius:20px; cursor:pointer;">Logout</button>
         </div>
     </div>
@@ -83,8 +83,25 @@
             
             <div class="panel" style="border-left: 4px solid var(--accent-gold);">
                 <h3 style="margin-top:0; color: var(--accent-gold);">⭐ Active Broadcast Fleet</h3>
-                <div id="fleet-container" style="display: flex; flex-wrap: wrap; gap: 15px; min-height: 80px;">
-                    <p style="color: var(--text-muted); margin: auto;">No ships assigned.</p>
+                <div id="fleet-grid" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px; background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155;">
+                    
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="width: 80px; text-align: right; color: var(--text-muted); font-size: 11px; font-weight: bold; text-transform: uppercase;">Main Fleet<br>主力舰队</div>
+                        <div id="grid-main" style="display: flex; gap: 10px; flex-grow: 1; min-height: 80px; border-left: 2px solid #334155; padding-left: 15px;"></div>
+                    </div>
+
+                    <div style="height: 1px; background: #334155; margin: 5px 0;"></div>
+
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="width: 80px; text-align: right; color: var(--text-muted); font-size: 11px; font-weight: bold; text-transform: uppercase;">Vanguard<br>先锋舰队</div>
+                        <div id="grid-vanguard" style="display: flex; gap: 10px; flex-grow: 1; min-height: 80px; border-left: 2px solid #334155; padding-left: 15px;"></div>
+                    </div>
+
+                    <div id="grid-sub-container" style="display: none; gap: 10px; align-items: center; border-top: 1px solid #334155; padding-top: 15px; margin-top: 5px;">
+                        <div style="width: 80px; text-align: right; color: var(--text-muted); font-size: 11px; font-weight: bold; text-transform: uppercase;">Submarines<br>潜艇舰队</div>
+                        <div id="grid-sub" style="display: flex; gap: 10px; flex-grow: 1; min-height: 80px; border-left: 2px solid #334155; padding-left: 15px;"></div>
+                    </div>
+
                 </div>
             </div>
 
@@ -334,27 +351,62 @@
         }
 
         function renderFleet() {
-            const container = document.getElementById('fleet-container');
+            const mainContainer = document.getElementById('grid-main');
+            const vanContainer = document.getElementById('grid-vanguard');
+            const subContainer = document.getElementById('grid-sub');
+            const subWrapper = document.getElementById('grid-sub-container');
+            
+            mainContainer.innerHTML = "";
+            vanContainer.innerHTML = "";
+            subContainer.innerHTML = "";
+            
+            let hasSubs = false;
+
+            // Arrays to categorize hull types based on game mechanics
+            const mainHulls = ['BB', 'BC', 'BBV', 'CV', 'CVL', 'AR', 'BM'];
+            const vanHulls = ['DD', 'CL', 'CA', 'CB', 'AE', 'DDG'];
+            const subHulls = ['SS', 'SSV', 'IX'];
+
             if (activeFleetIds.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted); margin: auto;">No ships assigned.</p>';
+                mainContainer.innerHTML = '<p style="color: var(--text-muted); margin: auto 0;">No Main Fleet assigned.</p>';
+                vanContainer.innerHTML = '<p style="color: var(--text-muted); margin: auto 0;">No Vanguard assigned.</p>';
+                subWrapper.style.display = "none";
                 return;
             }
-            container.innerHTML = ""; 
+
             activeFleetIds.forEach(id => {
                 const item = currentDockData.find(ship => ship.id === id);
-                if (item) {
-                    const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/60x60/1e293b/00f2fe?text=?';
-                    const div = document.createElement('div');
-                    div.style = "background: var(--bg-void); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--accent-gold); width: 80px;";
-                    div.innerHTML = `
-                        <img src="${img}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; margin-bottom: 5px; border: 1px solid #334155;">
-                        <div style="font-weight: bold; color: #fff; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.ship.name}</div>
+                if (!item) return;
+
+                const hull = item.ship.hull_type;
+                const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/60x60/1e293b/00f2fe?text=?';
+                
+                const cardHtml = `
+                    <div style="background: var(--bg-panel); padding: 8px; border-radius: 8px; text-align: center; border: 1px solid var(--accent-gold); width: 75px; position: relative;">
+                        <div style="position: absolute; top: -8px; left: -8px; background: var(--bg-void); border: 1px solid var(--accent-cyan); font-size: 9px; padding: 2px 4px; border-radius: 4px; font-weight: bold;">${hull}</div>
+                        <img src="${img}" style="width: 55px; height: 55px; border-radius: 6px; object-fit: cover; margin-bottom: 5px; border: 1px solid #334155;">
+                        <div style="font-weight: bold; color: #fff; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.ship.name}</div>
                         <div style="font-size: 10px; color: var(--success); margin-bottom: 5px;">Lv. ${item.level}</div>
                         <button onclick="toggleFleet(${item.id})" style="background: var(--danger); padding: 4px; font-size: 10px; width: 100%; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;">Remove</button>
-                    `;
-                    container.appendChild(div);
+                    </div>
+                `;
+
+                // Route the ship to the correct row based on her Hull Type
+                if (mainHulls.includes(hull)) {
+                    mainContainer.innerHTML += cardHtml;
+                } else if (vanHulls.includes(hull)) {
+                    vanContainer.innerHTML += cardHtml;
+                } else if (subHulls.includes(hull)) {
+                    subContainer.innerHTML += cardHtml;
+                    hasSubs = true;
+                } else {
+                    // Fallback just in case
+                    vanContainer.innerHTML += cardHtml;
                 }
             });
+
+            // Show/Hide the submarine row dynamically
+            subWrapper.style.display = hasSubs ? "flex" : "none";
         }
 
         // Sets the form to EDIT an existing ship
@@ -423,7 +475,7 @@
 
         async function fetchGlobalLibrary() {
             const container = document.getElementById('global-library');
-            container.innerHTML = `<div id="loading-msg" style="grid-column: 1/-1; text-align: center; color: var(--accent-cyan); animation: pulse 1.5s infinite;">📡 WAKING UP SERVER... PLEASE WAIT</div>`;
+            container.innerHTML = `<div id="loading-msg" style="grid-column: 1/-1; text-align: center; color: var(--accent-cyan); animation: pulse 1.5s infinite;">📡 WAKING UP THE SERVER... PLEASE WAIT</div>`;
             
             try {
                 const res = await fetch(`${API_URL}/ships/`);
