@@ -28,9 +28,8 @@ class ShipBaseStats(Base):
     __tablename__ = "ship_base_stats"
 
     id = Column(Integer, primary_key=True, index=True)
-    ship_id = Column(Integer, ForeignKey("ships.id")) 
+    ship_id = Column(Integer, ForeignKey("ships.id"), unique=True)
     
-    # Core Combat Stats
     health = Column(Integer)
     firepower = Column(Integer)
     torpedo = Column(Integer)
@@ -38,16 +37,24 @@ class ShipBaseStats(Base):
     anti_air = Column(Integer)
     reload = Column(Integer)
     evasion = Column(Integer)
-    
-    # Mechanics & Utility
-    armor_type = Column(String) # Light, Medium, Heavy
+    armor_type = Column(String)
     speed = Column(Integer)
     accuracy = Column(Integer)
     luck = Column(Integer)
     anti_sub = Column(Integer)
     oil_cost = Column(Integer)
 
-    # The Python bridge back to the Ship table
+    # --- ADD THESE MISSING 120 COLUMNS ---
+    hp_120 = Column(Integer, default=0)
+    fp_120 = Column(Integer, default=0)
+    aa_120 = Column(Integer, default=0)
+    avi_120 = Column(Integer, default=0)
+    trp_120 = Column(Integer, default=0)
+    reload_120 = Column(Integer, default=0)
+    evasion_120 = Column(Integer, default=0)
+    accuracy_120 = Column(Integer, default=0)
+    anti_sub_120 = Column(Integer, default=0)
+
     ship = relationship("Ship", back_populates="stats")
 
 # --- NEW TABLE: Dynamic Player Data ---
