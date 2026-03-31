@@ -189,142 +189,79 @@ def add_ship_stats(ship_id: int, stats: schemas.ShipStatsCreate, db: Session = D
     db.refresh(db_stats)
     return db_stats
 
-# Change the POST route to this:
+# --- ADD A BRAND NEW SHIP TO YOUR DOCK ---
 @app.post("/collection/", response_model=schemas.CollectionResponse)
 def add_to_collection(
     item: schemas.CollectionCreate, 
     db: Session = Depends(get_db), 
-    current_user: models.User = Depends(get_current_user) # The Scanner
+    current_user: models.User = Depends(get_current_user)
 ):
     db_item = models.MyCollection(
         ship_id=item.ship_id,
-        user_id=current_user.id, # Uses the ID from the Token!
+        user_id=current_user.id,
         level=item.level,
         is_oathed=item.is_oathed,
-        affection=item.affection
+        affection=item.affection,
+        # Save the initial bonuses (usually 0 when first added)
+        bonus_hp=item.bonus_hp,
+        bonus_fp=item.bonus_fp,
+        bonus_aa=item.bonus_aa,
+        bonus_avi=item.bonus_avi,
+        bonus_trp=item.bonus_trp,
+        bonus_rld=item.bonus_rld
     )
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
     return db_item
 
-@app.get("/collection/me", response_model=list[schemas.CollectionResponse])
-def get_my_collection(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    items = db.query(models.MyCollection).filter(models.MyCollection.user_id == current_user.id).all()
-    
-    for item in items:
-        # We find the physical base stats for this ship
-        base = db.query(models.ShipBaseStats).filter(models.ShipBaseStats.ship_id == item.ship_id).first()
-        if base:
-            # We call the math function we wrote earlier
-            item.calculated_stats = calculate_real_stats(base, item.level, item.affection, item.is_oathed)
-        else:
-            # If no stats found, show base 100 so it's not 0
-            item.calculated_stats = {"hp": 100, "fp": 10, "aa": 10}
-            
-    return items
-    
-@app.post("/users/", response_model=schemas.UserResponse)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    hashed = get_password_hash(user.password) # Scramble it!
-    db_user = models.User(username=user.username, hashed_password=hashed)
-    # ... rest of the save logic
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-    
-@app.post("/equipment/", response_model=schemas.EquipmentResponse)
-def create_equipment(item: schemas.EquipmentCreate, db: Session = Depends(get_db)):
-    db_item = models.Equipment(**item.dict())
-    db.add(db_item)
+# --- NEW: UPDATE AN EXISTING SHIP IN YOUR DOCK (THE PATCH ROUTE) ---
+@app.patch("/collection/{collection_id}", response_model=schemas.CollectionResponse)
+def update_collection_item(
+    collection_id: int,
+    item_update: schemas.CollectionCreate, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    # Find the exact ship in the user's dock
+    db_item = db.query(models.MyCollection).filter(
+        models.MyCollection.id == collection_id,
+        models.MyCollection.user_id == current_user.id
+    ).first()
+
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Ship not found in your dock")
+
+    # Update all parameters
+    db_item.level = item_update.level
+    db_item.affection = item_update.affection
+    db_item.is_oathed = item_update.is_oathed
+    db_item.bonus_hp = item_update.bonus_hp
+    db_item.bonus_fp = item_update.bonus_fp
+    db_item.bonus_aa = item_update.bonus_aa
+    db_item.bonus_avi = item_update.bonus_avi
+    db_item.bonus_trp = item_update.bonus_trp
+    db_item.bonus_rld = item_update.bonus_rld
+
     db.commit()
     db.refresh(db_item)
     return db_item
 
-@app.get("/equipment/", response_model=list[schemas.EquipmentResponse])
-def get_all_equipment(db: Session = Depends(get_db)):
-    equipment = db.query(models.Equipment).all()
-    return equipment
+# --- GET YOUR ENTIRE DOCK ---
+@app.get("/collection/me", response_model=list[schemas.CollectionResponse])
+def get_my_collection(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # We completely removed the old "calculate_real_stats" loop here!
+    # The database just sends the raw info, and your JavaScript engine handles all the complex math perfectly.
+    items = db.query(models.MyCollection).filter(models.MyCollection.user_id == current_user.id).all()
+    return items
 
-@app.patch("/collection/{collection_id}/equip/{slot_num}")
-def equip_gear(
-    collection_id: int, 
-    slot_num: int, 
-    equipment_id: int, 
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
-):
-    # 1. Verify the ship is in YOUR dock
-    db_item = db.query(models.MyCollection).filter(
-        models.MyCollection.id == collection_id, 
-        models.MyCollection.user_id == current_user.id
-    ).first()
-    
-    if not db_item:
-        raise HTTPException(status_code=404, detail="Ship not found in your dock.")
-
-    # 2. Verify the Equipment actually exists in the Global Armory
-    gear = db.query(models.Equipment).filter(models.Equipment.id == equipment_id).first()
-    if not gear:
-        raise HTTPException(status_code=404, detail="Equipment not found in database.")
-
-    # 3. The "Smart" Guardrails (Category Checking)
-    # Simplified Azur Lane logic for the database
-    valid = True
-    error_msg = ""
-
-    if slot_num == 1 and gear.category not in ["Main Gun", "Fighter", "Submarine Torpedo"]:
-        valid = False
-        error_msg = f"Slot 1 requires a Main Gun or Fighter. You tried to equip a {gear.category}."
-        
-    elif slot_num == 2 and gear.category not in ["Torpedo", "Dive Bomber", "Secondary Gun"]:
-        valid = False
-        error_msg = f"Slot 2 requires a Torpedo, Dive Bomber, or Secondary. You tried to equip a {gear.category}."
-        
-    elif slot_num == 3 and gear.category not in ["Anti-Air Gun", "Torpedo Bomber"]:
-        valid = False
-        error_msg = f"Slot 3 requires an AA Gun or Torpedo Bomber. You tried to equip a {gear.category}."
-        
-    elif slot_num in [4, 5] and gear.category != "Auxiliary":
-        valid = False
-        error_msg = f"Slots 4 and 5 are strictly for Auxiliary gear. You tried to equip a {gear.category}."
-
-    if not valid:
-        raise HTTPException(status_code=400, detail=error_msg)
-
-    # 4. If it passes all tests, physically bolt it onto the ship!
-    setattr(db_item, f"slot_{slot_num}", equipment_id)
-    
-    db.commit()
-    return {"message": f"Successfully equipped {gear.name} into Slot {slot_num}!"}
-    
-def calculate_real_stats(base_stats, level, affection, is_oathed):
-    # Simplified Azur Lane growth (1% increase per level for this example)
-    growth_factor = 1 + (level - 1) * 0.02 
-    
-    # Affection Bonus logic
-    bonus = 1.0
-    if is_oathed:
-        bonus = 1.12 # 12% boost for Oathed
-    elif affection >= 100:
-        bonus = 1.06 # 6% boost for Love
-        
-    calculated = {
-        "hp": int(base_stats.health * growth_factor * bonus),
-        "fp": int(base_stats.firepower * growth_factor * bonus),
-        "aa": int(base_stats.anti_air * growth_factor * bonus),
-        # Add more stats here as needed!
-    }
-    return calculated
-    
+# --- RETIRE A SHIP ---
 @app.delete("/collection/{collection_id}")
 def retire_ship(
     collection_id: int, 
     db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user)
 ):
-    # Only delete if it belongs to the logged-in user
     db_item = db.query(models.MyCollection).filter(
         models.MyCollection.id == collection_id, 
         models.MyCollection.user_id == current_user.id

@@ -120,6 +120,9 @@
         <div id="tab-engineering" class="tab-content">
             <div class="panel">
                 <h3 style="color:var(--accent-cyan); margin-top:0;">Ship Modification & Enhancement</h3>
+                
+                <input type="hidden" id="editCollectionId" value="">
+
                 <div class="eng-grid">
                     <div><label>Ship ID</label><input type="number" id="shipId" readonly style="background:#1e293b; color:#94a3b8;"></div>
                     <div><label>Level</label><input type="number" id="shipLevel" value="1"></div>
@@ -129,18 +132,18 @@
                     </div>
                 </div>
 
-                <h4 style="color:var(--accent-gold); border-bottom:1px solid #334155; padding-bottom:5px; margin-top:25px;">Account Bonuses (Enhancement + Fleet Tech)</h4>
-                <p style="font-size:11px; color:var(--text-muted); margin-top:-5px;">Enter the "+ Green Numbers" shown in-game when no gear is equipped.</p>
+                <h4 style="color:var(--accent-gold); border-bottom:1px solid #334155; padding-bottom:5px; margin-top:25px;">Manual Stat Correction (Enhancement + Fleet Tech)</h4>
+                <p style="font-size:11px; color:var(--text-muted); margin-top:-5px;">Subtract the dashboard's stat from your in-game <b>White Base Stat</b>, and enter the difference here.</p>
                 <div class="eng-grid">
-                    <div><label>Bonus ❤️ HP</label><input type="number" id="bonusHp" value="0"></div>
-                    <div><label>Bonus ⚔️ FP</label><input type="number" id="bonusFp" value="0"></div>
-                    <div><label>Bonus 🛡️ AA</label><input type="number" id="bonusAa" value="0"></div>
-                    <div><label>Bonus ✈️ AVI</label><input type="number" id="bonusAvi" value="0"></div>
-                    <div><label>Bonus 🐟 TRP</label><input type="number" id="bonusTrp" value="0"></div>
-                    <div><label>Bonus ⏱️ RLD</label><input type="number" id="bonusRld" value="0"></div>
+                    <div><label>Offset ❤️ HP</label><input type="number" id="bonusHp" value="0"></div>
+                    <div><label>Offset ⚔️ FP</label><input type="number" id="bonusFp" value="0"></div>
+                    <div><label>Offset 🛡️ AA</label><input type="number" id="bonusAa" value="0"></div>
+                    <div><label>Offset ✈️ AVI</label><input type="number" id="bonusAvi" value="0"></div>
+                    <div><label>Offset 🐟 TRP</label><input type="number" id="bonusTrp" value="0"></div>
+                    <div><label>Offset ⏱️ RLD</label><input type="number" id="bonusRld" value="0"></div>
                 </div>
 
-                <button class="action-btn" onclick="addShipToAPI()">Update Ship Data</button>
+                <button class="action-btn" onclick="saveShipToAPI()">💾 Save Ship Data</button>
             </div>
         </div>
 
@@ -329,11 +332,16 @@
             });
         }
 
+        // Sets the form to EDIT an existing ship
         function editShip(collectionId) {
             const item = currentDockData.find(s => s.id === collectionId);
             if (!item) return;
             
             switchTab('tab-engineering', document.querySelectorAll('.tab-btn')[2]);
+            
+            // Populate the hidden tracker so we know exactly which ship to update
+            document.getElementById('editCollectionId').value = collectionId; 
+
             document.getElementById('shipId').value = item.ship_id; 
             document.getElementById('shipLevel').value = item.level;
             document.getElementById('shipAffection').value = item.affection;
@@ -347,7 +355,10 @@
             document.getElementById('bonusRld').value = item.bonus_rld || 0;
         }
 
-        async function addShipToAPI() {
+        // Handles both Updating and Adding
+        async function saveShipToAPI() {
+            const editId = document.getElementById('editCollectionId').value;
+            
             const payload = {
                 ship_id: parseInt(document.getElementById('shipId').value),
                 level: parseInt(document.getElementById('shipLevel').value),
@@ -361,11 +372,22 @@
                 bonus_rld: parseInt(document.getElementById('bonusRld').value) || 0
             };
             
-            await fetch(`${API_URL}/collection/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(payload)
-            });
+            if (editId) {
+                // If we have an ID, we send a PATCH request to UPDATE the existing ship
+                await fetch(`${API_URL}/collection/${editId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+            } else {
+                // (Fallback) If we don't have an ID, we POST a new one
+                await fetch(`${API_URL}/collection/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+            }
+            
             fetchMyDock();
             switchTab('tab-command', document.querySelector('.tab-btn'));
         }
@@ -457,7 +479,10 @@
             fetchMyDock();
         }
 
+        // Adds a brand new ship from the Shipyard
         async function quickAdd(id) {
+            document.getElementById('editCollectionId').value = ""; // Clear the edit tracker
+            
             await fetch(`${API_URL}/collection/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },

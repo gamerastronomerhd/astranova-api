@@ -78,6 +78,17 @@ class MyCollection(Base):
     level = Column(Integer, default=1)
     is_oathed = Column(Boolean, default=False)
     affection = Column(Integer, default=50)
+    
+    bonus_hp = Column(Integer, default=0)
+    bonus_fp = Column(Integer, default=0)
+    bonus_aa = Column(Integer, default=0)
+    bonus_avi = Column(Integer, default=0)
+    bonus_trp = Column(Integer, default=0)
+    bonus_rld = Column(Integer, default=0)
+    
+    # Relationships
+    ship = relationship("Ship")
+    user = relationship("User", back_populates="collection")
 
     # --- THE NEW GEAR SLOTS ---
     # These store the ID of a piece of equipment from the 'equipment' table
