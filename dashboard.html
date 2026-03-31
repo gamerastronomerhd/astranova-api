@@ -66,23 +66,40 @@
         </div>
 
         <div id="tab-command" class="tab-content active">
+            <div class="panel" style="border-left: 4px solid var(--accent-gold);">
+                <h3 style="margin-top:0; color: var(--accent-gold);">⭐ Active Broadcast Fleet</h3>
+                <div id="fleet-container" style="display: flex; flex-wrap: wrap; gap: 15px; min-height: 80px;">
+                    <p style="color: var(--text-muted); margin: auto;">No ships assigned.</p>
+                </div>
+            </div>
             <div id="dock-container" class="grid-container"></div>
         </div>
 
         <div id="tab-shipyard" class="tab-content">
-            <div class="panel"><input type="text" id="libSearch" placeholder="🔍 Search database..." onkeyup="filterLibrary()"></div>
+            <div class="panel">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <input type="text" id="libSearch" placeholder="🔍 Search database..." onkeyup="filterLibrary()" style="flex-grow: 1;">
+                    <select id="filterFaction" onchange="filterLibrary()" style="width: auto;">
+                        <option value="all">All Factions</option>
+                        <option value="eagle union">Eagle Union</option>
+                        <option value="royal navy">Royal Navy</option>
+                        <option value="sakura empire">Sakura Empire</option>
+                        <option value="iron blood">Iron Blood</option>
+                    </select>
+                </div>
+            </div>
             <div id="global-library" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;"></div>
         </div>
 
         <div id="tab-engineering" class="tab-content">
             <div class="panel">
-                <h3 style="color:var(--accent-cyan)">Ship Modification (Manual Override)</h3>
+                <h3 style="color:var(--accent-cyan); margin-top:0;">Ship Modification</h3>
                 <div class="eng-grid">
                     <div><label>Ship ID</label><input type="number" id="shipId"></div>
                     <div><label>Level</label><input type="number" id="shipLevel" value="1"></div>
                     <div><label>Affection</label><input type="number" id="shipAffection" value="50"></div>
                     <div style="display:flex; align-items:center; gap:10px; margin-top:20px;">
-                        <input type="checkbox" id="shipOathed" style="width:20px"> <label>Oathed 💍</label>
+                        <input type="checkbox" id="shipOathed" style="width:20px"> <label style="margin:0">Oathed 💍</label>
                     </div>
                 </div>
                 <button class="action-btn" onclick="addShipToAPI()">Update Ship Data</button>
@@ -91,7 +108,7 @@
 
         <div id="tab-logistics" class="tab-content">
             <div class="panel">
-                <h3 style="color:var(--accent-gold)">Awakening Calculator</h3>
+                <h3 style="color:var(--accent-gold); margin-top:0;">Awakening Calculator</h3>
                 <div class="eng-grid">
                     <div><label>Select Ship</label><select id="calcDockId"></select></div>
                     <div><label>Target Level</label><select id="calcTargetLevel"><option value="120">120</option><option value="125">125</option></select></div>
@@ -107,7 +124,9 @@
         const token = localStorage.getItem('astra_token');
         if (!token) window.location.href = 'login.html';
 
-        let allShipsInDB = []; let currentDockData = [];
+        let allShipsInDB = []; 
+        let currentDockData = [];
+        let activeFleetIds = JSON.parse(localStorage.getItem('astra_active_fleet')) || []; 
 
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -117,22 +136,25 @@
         }
 
         async function fetchMyDock() {
-            const res = await fetch(`${API_URL}/collection/me`, { headers: { 'Authorization': `Bearer ${token}` } });
-            currentDockData = await res.json();
-            renderDock();
-            
-            // Populate Logistics Dropdown
-            const sel = document.getElementById('calcDockId');
-            sel.innerHTML = currentDockData.map(s => `<option value="${s.id}">${s.ship.name}</option>`).join('');
+            try {
+                const res = await fetch(`${API_URL}/collection/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+                currentDockData = await res.json();
+                renderDock();
+                renderFleet();
+                
+                // Populate Logistics Dropdown
+                const sel = document.getElementById('calcDockId');
+                sel.innerHTML = currentDockData.map(s => `<option value="${s.id}">${s.ship.name} (Lv.${s.level})</option>`).join('');
+            } catch (error) {
+                console.error("Failed to fetch dock", error);
+            }
         }
 
         function renderDock() {
             const container = document.getElementById('dock-container');
             container.innerHTML = "";
             currentDockData.forEach(item => {
-                const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/100';
-                
-                // Stat Calculation logic
+                const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/100x100/1e293b/00f2fe?text=?';
                 const stats = item.calculated_stats || {hp: 0, fp: 0, aa: 0};
                 
                 const card = document.createElement('div');
@@ -145,9 +167,47 @@
                         <div style="font-size:11px; margin-top:5px; color:var(--text-muted)">
                             ❤️ ${stats.hp} | ⚔️ ${stats.fp} | 🛡️ ${stats.aa}
                         </div>
-                        <button onclick="editShip(${item.ship.id}, ${item.level}, ${item.affection}, ${item.is_oathed})" style="margin-top:8px; font-size:10px; cursor:pointer">🔧 Edit</button>
+                        <div style="display:flex; gap:5px; margin-top:8px;">
+                            <button onclick="editShip(${item.ship.id}, ${item.level}, ${item.affection}, ${item.is_oathed})" style="font-size:10px; cursor:pointer; background:#334155; color:white; border:none; border-radius:4px; padding:4px 8px;">🔧 Edit</button>
+                            <button onclick="toggleFleet(${item.id})" style="font-size:10px; cursor:pointer; background:var(--accent-gold); color:black; border:none; border-radius:4px; padding:4px 8px; font-weight:bold;">⭐ Assign</button>
+                        </div>
                     </div>`;
                 container.appendChild(card);
+            });
+        }
+
+        function toggleFleet(collectionId) {
+            if (activeFleetIds.includes(collectionId)) {
+                activeFleetIds = activeFleetIds.filter(id => id !== collectionId);
+            } else {
+                if (activeFleetIds.length >= 6) { alert("Fleet is full! Maximum 6 ships."); return; }
+                activeFleetIds.push(collectionId);
+            }
+            localStorage.setItem('astra_active_fleet', JSON.stringify(activeFleetIds));
+            renderFleet();
+        }
+
+        function renderFleet() {
+            const container = document.getElementById('fleet-container');
+            if (activeFleetIds.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); margin: auto;">No ships assigned.</p>';
+                return;
+            }
+            container.innerHTML = ""; 
+            activeFleetIds.forEach(id => {
+                const item = currentDockData.find(ship => ship.id === id);
+                if (item) {
+                    const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/60x60/1e293b/00f2fe?text=?';
+                    const div = document.createElement('div');
+                    div.style = "background: var(--bg-void); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--accent-gold); width: 80px;";
+                    div.innerHTML = `
+                        <img src="${img}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; margin-bottom: 5px; border: 1px solid #334155;">
+                        <div style="font-weight: bold; color: #fff; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.ship.name}</div>
+                        <div style="font-size: 10px; color: var(--success); margin-bottom: 5px;">Lv. ${item.level}</div>
+                        <button onclick="toggleFleet(${item.id})" style="background: var(--danger); padding: 4px; font-size: 10px; width: 100%; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;">Remove</button>
+                    `;
+                    container.appendChild(div);
+                }
             });
         }
 
@@ -176,26 +236,121 @@
         }
 
         async function fetchGlobalLibrary() {
-            const res = await fetch(`${API_URL}/ships/`);
-            allShipsInDB = await res.json();
             const container = document.getElementById('global-library');
-            container.innerHTML = allShipsInDB.map(ship => `
-                <div class="global-card" data-name="${ship.name.toLowerCase()}">
-                    <div style="background:var(--bg-panel); padding:10px; border-radius:8px; text-align:center; border:1px solid var(--border-color)">
-                        <img src="${ship.icon_url}" style="width:60px; height:60px; border-radius:8px; object-fit:cover">
-                        <div style="font-size:12px; font-weight:bold; margin-top:5px; overflow:hidden">${ship.name}</div>
-                        <button onclick="quickAdd(${ship.id})" style="width:100%; margin-top:5px; background:var(--success); border:none; cursor:pointer">+ Add</button>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding:40px; color: var(--accent-cyan); font-weight:bold; letter-spacing:2px; animation: pulse 1.5s infinite;">📡 SYNCHRONIZING WITH GLOBAL DATABASE... PLEASE WAIT</div>`;
+            try {
+                const res = await fetch(`${API_URL}/ships/`);
+                allShipsInDB = await res.json();
+                container.innerHTML = "";
+                
+                allShipsInDB.forEach(ship => {
+                    const img = (ship.icon_url && ship.icon_url !== "null") ? ship.icon_url : 'https://placehold.co/100x100/1e293b/00f2fe?text=?';
+                    const div = document.createElement('div');
+                    div.className = "global-card";
+                    div.setAttribute('data-name', ship.name.toLowerCase());
+                    div.setAttribute('data-faction', ship.faction.toLowerCase());
+                    div.innerHTML = `
+                        <div style="background:var(--bg-panel); padding:10px; border-radius:8px; text-align:center; border:1px solid var(--border-color); transition:0.2s;">
+                            <img src="${img}" style="width:60px; height:60px; border-radius:8px; object-fit:cover; margin-bottom:5px;">
+                            <div style="font-size:12px; font-weight:bold; overflow:hidden; white-space:nowrap;">${ship.name}</div>
+                            <div style="font-size:9px; color:var(--text-muted); margin-bottom:5px;">${ship.faction}</div>
+                            <button onclick="quickAdd(${ship.id})" style="width:100%; padding:6px; font-size:11px; font-weight:bold; background:rgba(34, 197, 94, 0.2); color:var(--success); border:1px solid var(--success); border-radius:4px; cursor:pointer;">+ Quick Add</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                container.innerHTML = `<div style="grid-column: 1/-1; color: var(--danger);">⚠️ Link failed. Server is likely booting up.</div>`;
+            }
+        }
+
+        function filterLibrary() {
+            const term = document.getElementById('libSearch').value.toLowerCase();
+            const faction = document.getElementById('filterFaction').value.toLowerCase();
+            
+            document.querySelectorAll('.global-card').forEach(card => {
+                const nameMatch = card.getAttribute('data-name').includes(term);
+                const factionMatch = faction === 'all' || card.getAttribute('data-faction').includes(faction);
+                card.style.display = (nameMatch && factionMatch) ? "block" : "none";
+            });
+        }
+
+        async function quickAdd(id) {
+            await fetch(`${API_URL}/collection/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ ship_id: id, level: 1, affection: 50, is_oathed: false })
+            });
+            fetchMyDock();
+            switchTab('tab-command', document.querySelector('.tab-btn'));
         }
 
         function calculateAwakening() {
-            const ship = currentDockData.find(s => s.id == document.getElementById('calcDockId').value);
+            const shipId = document.getElementById('calcDockId').value;
             const target = parseInt(document.getElementById('calcTargetLevel').value);
+            const ship = currentDockData.find(s => s.id == shipId);
+
+            if (!ship) return;
+            const currentLvl = ship.level;
+            const rarity = ship.ship.rarity;
+
+            if (currentLvl >= target) {
+                alert(`Commander, ${ship.ship.name} is already at or above Level ${target}!`);
+                return;
+            }
+
+            let coins = 0; let chips = 0; let arrays = 0;
+            const milestones = [100, 105, 110, 115, 120];
+            
+            milestones.forEach(m => {
+                if (currentLvl <= m && target > m) {
+                    if (rarity === "Ultra Rare") {
+                        if (m === 100) { coins += 3000; chips += 150; }
+                        if (m === 105) { coins += 4500; chips += 200; }
+                        if (m === 110) { coins += 6000; chips += 250; }
+                        if (m === 115) { coins += 7500; chips += 300; }
+                        if (m === 120) { coins += 15000; chips += 800; arrays += 50; }
+                    } else if (rarity === "Super Rare") {
+                        if (m === 100) { coins += 2000; chips += 120; }
+                        if (m === 105) { coins += 3000; chips += 150; }
+                        if (m === 110) { coins += 4000; chips += 180; }
+                        if (m === 115) { coins += 5000; chips += 200; }
+                        if (m === 120) { coins += 10000; chips += 500; arrays += 50; }
+                    } else {
+                        if (m === 100) { coins += 1000; chips += 80; }
+                        if (m === 105) { coins += 1500; chips += 100; }
+                        if (m === 110) { coins += 2000; chips += 120; }
+                        if (m === 115) { coins += 2500; chips += 140; }
+                        if (m === 120) { coins += 5000; chips += 300; arrays += 50; }
+                    }
+                }
+            });
+
             const resDiv = document.getElementById('calcResults');
             resDiv.style.display = "block";
-            resDiv.innerHTML = `<h4>Resource Needs for ${ship.ship.name}:</h4><p>Targeting Lv.${target}... (Calculation logic restored)</p>`;
+            resDiv.innerHTML = `
+                <div style="border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 15px;">
+                    <h4 style="margin:0; color: white;">Awakening Plan: <span style="color:var(--accent-gold)">${ship.ship.name}</span></h4>
+                    <small style="color:var(--text-muted)">From Lv.${currentLvl} to Target Lv.${target}</small>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                    <div style="text-align:center; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;">
+                        <div style="font-size:20px">🪙</div>
+                        <div style="font-weight:bold; color:var(--accent-gold)">${coins.toLocaleString()}</div>
+                        <div style="font-size:10px; color:var(--text-muted)">COINS</div>
+                    </div>
+                    <div style="text-align:center; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;">
+                        <div style="font-size:20px">🧬</div>
+                        <div style="font-weight:bold; color:var(--accent-cyan)">${chips.toLocaleString()}</div>
+                        <div style="font-size:10px; color:var(--text-muted)">CHIPS</div>
+                    </div>
+                    <div style="text-align:center; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;">
+                        <div style="font-size:20px">💠</div>
+                        <div style="font-weight:bold; color:#c38dff">${arrays.toLocaleString()}</div>
+                        <div style="font-size:10px; color:var(--text-muted)">ARRAYS</div>
+                    </div>
+                </div>
+            `;
         }
 
         function saveResources() {
