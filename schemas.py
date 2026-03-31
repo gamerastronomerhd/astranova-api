@@ -36,8 +36,13 @@ class ShipStatsCreate(BaseModel):
     accuracy_120: int | None = 0
     anti_sub_120: int | None = 0
     
-    tech_stat: str | None = None
-    tech_value: int | None = 0
+# Delete tech_stat and tech_value, and add these:
+    get_stat: str | None = None
+    get_value: int | None = 0
+    mlb_stat: str | None = None
+    mlb_value: int | None = 0
+    lv120_stat: str | None = None
+    lv120_value: int | None = 0
 
 class ShipStats(ShipStatsCreate):
     id: int

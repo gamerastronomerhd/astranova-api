@@ -15,15 +15,12 @@ class Ship(Base):
     faction = Column(String) # e.g., "Eagle Union", "Sakura Empire"
     hull_type = Column(String) # e.g., "CV", "BB", "DD"
     is_research = Column(Boolean, default=False) # Is it a PR/DR ship?
-    icon_url = Column(String, nullable=True) # Image CDN Link (Connecting to your Cloudflare R2 bucket later)
+    icon_url = Column(String, nullable=True) # Image CDN Link
 
-    # --- NEW: The Relationships ---
-    # A ship has one specific set of base stats
+    # Relationships
     stats = relationship("ShipBaseStats", back_populates="ship", uselist=False)
-    # A ship can appear in your collection (1-to-many, to account for duplicate copies)
     collection_entries = relationship("MyCollection", back_populates="ship")
 
-# --- NEW TABLE: Static Game Data ---
 class ShipBaseStats(Base):
     __tablename__ = "ship_base_stats"
 
@@ -44,7 +41,7 @@ class ShipBaseStats(Base):
     anti_sub = Column(Integer)
     oil_cost = Column(Integer)
 
-    # --- ADD THESE MISSING 120 COLUMNS ---
+    # 120 COLUMNS
     hp_120 = Column(Integer, default=0)
     fp_120 = Column(Integer, default=0)
     aa_120 = Column(Integer, default=0)
@@ -55,9 +52,15 @@ class ShipBaseStats(Base):
     accuracy_120 = Column(Integer, default=0)
     anti_sub_120 = Column(Integer, default=0)
 
-    ship = relationship("Ship", back_populates="stats")
+    # --- NEW: 3-TIER FLEET TECH COLUMNS ---
+    get_stat = Column(String, nullable=True)
+    get_value = Column(Integer, default=0)
+    mlb_stat = Column(String, nullable=True)
+    mlb_value = Column(Integer, default=0)
+    lv120_stat = Column(String, nullable=True)
+    lv120_value = Column(Integer, default=0)
 
-# --- NEW TABLE: Dynamic Player Data ---
+    ship = relationship("Ship", back_populates="stats")
 
 class User(Base):
     __tablename__ = "users"
@@ -93,21 +96,17 @@ class MyCollection(Base):
     bonus_trp = Column(Integer, default=0)
     bonus_rld = Column(Integer, default=0)
     
-    # Relationships
-    ship = relationship("Ship")
-    user = relationship("User", back_populates="collection")
-
-    # --- THE NEW GEAR SLOTS ---
-    # These store the ID of a piece of equipment from the 'equipment' table
+    # THE NEW GEAR SLOTS
     slot_1 = Column(Integer, ForeignKey("equipment.id"), nullable=True)
     slot_2 = Column(Integer, ForeignKey("equipment.id"), nullable=True)
     slot_3 = Column(Integer, ForeignKey("equipment.id"), nullable=True)
     slot_4 = Column(Integer, ForeignKey("equipment.id"), nullable=True)
     slot_5 = Column(Integer, ForeignKey("equipment.id"), nullable=True)
 
-    ship = relationship("Ship")
+    # --- CLEANED UP RELATIONSHIPS ---
+    ship = relationship("Ship", back_populates="collection_entries")
     owner = relationship("User", back_populates="collection")
-    # Relationships to see what gear is equipped
+    
     eq1 = relationship("Equipment", foreign_keys=[slot_1])
     eq2 = relationship("Equipment", foreign_keys=[slot_2])
     eq3 = relationship("Equipment", foreign_keys=[slot_3])
