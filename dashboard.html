@@ -72,13 +72,12 @@
                     <p style="color: var(--text-muted); margin: auto;">No ships assigned.</p>
                 </div>
             </div>
-			<div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <h3 style="margin:0; color:var(--accent-cyan)">Personal Dock</h3>
-    <button onclick="bulkRetireCommons()" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;">
-        🗑️ Bulk Retire Commons
-    </button>
-</div>
-
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin:0; color:var(--accent-cyan)">Personal Dock</h3>
+                <button onclick="bulkRetireCommons()" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;">
+                    🗑️ Bulk Retire Commons
+                </button>
+            </div>
             <div id="dock-container" class="grid-container"></div>
         </div>
 
@@ -102,7 +101,7 @@
             <div class="panel">
                 <h3 style="color:var(--accent-cyan); margin-top:0;">Ship Modification</h3>
                 <div class="eng-grid">
-                    <div><label>Ship ID</label><input type="number" id="shipId"></div>
+                    <div><label>Ship ID</label><input type="number" id="shipId" readonly style="background:#1e293b; color:#94a3b8;"></div>
                     <div><label>Level</label><input type="number" id="shipLevel" value="1"></div>
                     <div><label>Affection</label><input type="number" id="shipAffection" value="50"></div>
                     <div style="display:flex; align-items:center; gap:10px; margin-top:20px;">
@@ -149,7 +148,6 @@
                 renderDock();
                 renderFleet();
                 
-                // Populate Logistics Dropdown
                 const sel = document.getElementById('calcDockId');
                 sel.innerHTML = currentDockData.map(s => `<option value="${s.id}">${s.ship.name} (Lv.${s.level})</option>`).join('');
             } catch (error) {
@@ -157,32 +155,43 @@
             }
         }
 
-function renderDock() {
+        function renderDock() {
             const container = document.getElementById('dock-container');
             container.innerHTML = "";
             
             currentDockData.forEach(item => {
                 const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/100x100/1e293b/00f2fe?text=?';
                 
-                // FIXED: Accessing stats from the .stats sub-object
-                // If the database is empty, it uses the Bulldog-tier defaults instead of 100
-                const baseHp = (item.ship.stats && item.ship.stats.health) ? item.ship.stats.health : 200;
-                const baseFp = (item.ship.stats && item.ship.stats.firepower) ? item.ship.stats.firepower : 10;
-                const baseAa = (item.ship.stats && item.ship.stats.anti_air) ? item.ship.stats.anti_air : 10;
+                const s = item.ship.stats || {};
                 
-                // Azur Lane Growth Multiplier
-                const levelMultiplier = 1 + ((item.level - 1) * 0.02);
+                // Fixed Nullish coalescing (??) so 0 is accepted as a valid stat for carriers
+                const baseHp = s.health ?? 200;
+                const baseFp = s.firepower ?? 0;
+                const baseAa = s.anti_air ?? 0;
+                const baseAvi = s.aviation ?? 0;
+                const baseTrp = s.torpedo ?? 0;
                 
-                // Affection Bonus
+                // Improved linear math multiplier (~4.8% per level is highly accurate for AL)
+                const levelMultiplier = 1 + ((item.level - 1) * 0.048);
+                
                 let affectionBonus = 1.0;
                 if (item.is_oathed) affectionBonus = 1.12;
                 else if (item.affection >= 100) affectionBonus = 1.06;
+                else if (item.affection >= 90) affectionBonus = 1.03;
 
-                // Final Calculation
                 const finalHp = Math.floor(baseHp * levelMultiplier * affectionBonus);
                 const finalFp = Math.floor(baseFp * levelMultiplier * affectionBonus);
                 const finalAa = Math.floor(baseAa * levelMultiplier * affectionBonus);
+                const finalAvi = Math.floor(baseAvi * levelMultiplier * affectionBonus);
+                const finalTrp = Math.floor(baseTrp * levelMultiplier * affectionBonus);
                 
+                // Dynamically build the stat string so carriers show Aviation instead of 0 FP
+                let statDisplay = `❤️ ${finalHp.toLocaleString()}`;
+                if (finalFp > 0 || (finalAvi === 0 && finalTrp === 0)) statDisplay += ` | ⚔️ ${finalFp.toLocaleString()}`;
+                if (finalTrp > 0) statDisplay += ` | 🐟 ${finalTrp.toLocaleString()}`;
+                if (finalAvi > 0) statDisplay += ` | ✈️ ${finalAvi.toLocaleString()}`;
+                if (finalAa > 0) statDisplay += ` | 🛡️ ${finalAa.toLocaleString()}`;
+
                 const card = document.createElement('div');
                 card.className = `ship-card rarity-${item.ship.rarity.replace(/\s+/g, '')}`;
                 card.innerHTML = `
@@ -191,7 +200,7 @@ function renderDock() {
                         <h3 style="margin:0">${item.ship.name}</h3>
                         <div style="font-size:12px; color:var(--accent-cyan)">Lv. ${item.level}</div>
                         <div style="font-size:11px; margin-top:5px; color:var(--text-muted)">
-                            ❤️ ${finalHp.toLocaleString()} | ⚔️ ${finalFp.toLocaleString()} | 🛡️ ${finalAa.toLocaleString()}
+                            ${statDisplay}
                         </div>
                         <div style="display:flex; gap:5px; margin-top:8px;">
                             <button onclick="editShip(${item.ship.id}, ${item.level}, ${item.affection}, ${item.is_oathed})" style="font-size:10px; cursor:pointer; background:#334155; color:white; border:none; border-radius:4px; padding:4px 8px;">🔧 Edit</button>
@@ -262,12 +271,10 @@ function renderDock() {
             switchTab('tab-command', document.querySelector('.tab-btn'));
         }
 
-		let displayedCount = 40; // Only show 40 at a time initially
-
-let shipyardBatch = 30; 
+        let displayedCount = 40; 
+        let shipyardBatch = 30; 
         let currentDisplayCount = 30;
 
-        // Optimized Global Library Fetch
         async function fetchGlobalLibrary() {
             const container = document.getElementById('global-library');
             container.innerHTML = `<div id="loading-msg" style="grid-column: 1/-1; text-align: center; color: var(--accent-cyan); animation: pulse 1.5s infinite;">📡 WAKING UP SERVER... PLEASE WAIT</div>`;
@@ -276,7 +283,7 @@ let shipyardBatch = 30;
                 const res = await fetch(`${API_URL}/ships/`);
                 if (!res.ok) throw new Error("Server Booting");
                 allShipsInDB = await res.json();
-                renderShipyard(true); // Initial render
+                renderShipyard(true);
             } catch (err) {
                 container.innerHTML = `<div style="grid-column: 1/-1; color: var(--danger); text-align:center;">⚠️ Link failed. Open <a href="${API_URL}/ships/" target="_blank" style="color:white">this link</a> once to wake the server, then refresh.</div>`;
             }
@@ -288,14 +295,12 @@ let shipyardBatch = 30;
             const term = document.getElementById('libSearch').value.toLowerCase();
             const faction = document.getElementById('filterFaction').value.toLowerCase();
 
-            // Filter the master list
             const filtered = allShipsInDB.filter(ship => {
                 const nameMatch = ship.name.toLowerCase().includes(term);
                 const factionMatch = faction === 'all' || ship.faction.toLowerCase().includes(faction);
                 return nameMatch && factionMatch;
             });
 
-            // Slice for Lazy Loading
             const toDisplay = filtered.slice(0, currentDisplayCount);
             
             container.innerHTML = toDisplay.map(ship => `
@@ -309,7 +314,6 @@ let shipyardBatch = 30;
             `).join('');
         }
 
-        // Detect Scroll to Bottom
         window.onscroll = function() {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
                 if (currentDisplayCount < allShipsInDB.length) {
@@ -319,27 +323,38 @@ let shipyardBatch = 30;
             }
         };
 
-        // Improved Filter (Resets count)
         function filterLibrary() {
             renderShipyard(true);
         }
 
-        // NEW: Bulk Retire Logic
-        async function bulkRetireCommons() {
-            const commons = currentDockData.filter(item => item.ship.rarity === "Common" || item.ship.rarity === "Rare");
-            if (commons.length === 0) return alert("No Common/Rare ships found to retire.");
-            
-            if (!confirm(`Commander, are you sure you want to retire ${commons.length} ships?`)) return;
+        async function retireShip(collectionId) {
+            if (!confirm("Confirm Retirement? This ship will leave the fleet forever.")) return;
+            await fetch(`${API_URL}/collection/${collectionId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            fetchMyDock();
+        }
 
-            // Use Promise.all to fire all deletes at once for speed
-            await Promise.all(commons.map(ship => 
-                fetch(`${API_URL}/collection/${ship.id}`, {
+        async function bulkRetireCommons() {
+            const commons = currentDockData.filter(item => 
+                item.ship.rarity && item.ship.rarity.toLowerCase() === "common"
+            );
+
+            if (commons.length === 0) {
+                alert("No Common quality ships found in the dockyard.");
+                return;
+            }
+
+            if (!confirm(`Commander, shall we scrap all ${commons.length} Common ships?`)) return;
+
+            for (const ship of commons) {
+                await fetch(`${API_URL}/collection/${ship.id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
-                })
-            ));
-
-            alert("Retirement complete. Resources reclaimed.");
+                });
+            }
+            alert("Bulk Retirement successful.");
             fetchMyDock();
         }
 
@@ -436,38 +451,6 @@ let shipyardBatch = 30;
         function logout() { localStorage.removeItem('astra_token'); window.location.href = 'login.html'; }
 
         loadResources(); fetchGlobalLibrary(); fetchMyDock();
-		
-		async function retireShip(collectionId) {
-            if (!confirm("Confirm Retirement? This ship will leave the fleet forever.")) return;
-            await fetch(`${API_URL}/collection/${collectionId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            fetchMyDock();
-        }
-
-async function bulkRetireCommons() {
-            // FIXED: Added .toLowerCase() to handle "Common" vs "common"
-            const commons = currentDockData.filter(item => 
-                item.ship.rarity && item.ship.rarity.toLowerCase() === "common"
-            );
-
-            if (commons.length === 0) {
-                alert("No Common quality ships found in the dockyard. (Check if your Ships are 'Common' or 'Rare')");
-                return;
-            }
-
-            if (!confirm(`Commander, shall we scrap all ${commons.length} Common ships?`)) return;
-
-            for (const ship of commons) {
-                await fetch(`${API_URL}/collection/${ship.id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-            }
-            alert("Bulk Retirement successful.");
-            fetchMyDock();
-        }
     </script>
 </body>
 </html>
