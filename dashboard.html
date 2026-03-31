@@ -160,28 +160,25 @@
 function renderDock() {
             const container = document.getElementById('dock-container');
             container.innerHTML = "";
+            
             currentDockData.forEach(item => {
                 const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/100x100/1e293b/00f2fe?text=?';
                 
-                // 1. Pull the raw Base Level 1 stats from the database
-                const baseHp = item.ship.health || 100;
-                const baseFp = item.ship.firepower || 10;
-                const baseAa = item.ship.anti_air || 10;
+                // FIXED: Accessing stats from the .stats sub-object
+                // If the database is empty, it uses the Bulldog-tier defaults instead of 100
+                const baseHp = (item.ship.stats && item.ship.stats.health) ? item.ship.stats.health : 200;
+                const baseFp = (item.ship.stats && item.ship.stats.firepower) ? item.ship.stats.firepower : 10;
+                const baseAa = (item.ship.stats && item.ship.stats.anti_air) ? item.ship.stats.anti_air : 10;
                 
-                // 2. Azur Lane Growth Multiplier (Approximate linear scaling)
-                const levelMultiplier = 1 + ((item.level - 1) * 0.025);
+                // Azur Lane Growth Multiplier
+                const levelMultiplier = 1 + ((item.level - 1) * 0.02);
                 
-                // 3. Affection Bonus (Stranger: 1.0, Crush/Love: 1.06, Oath: 1.12)
+                // Affection Bonus
                 let affectionBonus = 1.0;
-                if (item.is_oathed) {
-                    affectionBonus = 1.12;
-                } else if (item.affection >= 100) {
-                    affectionBonus = 1.06;
-                } else if (item.affection >= 90) {
-                    affectionBonus = 1.03;
-                }
+                if (item.is_oathed) affectionBonus = 1.12;
+                else if (item.affection >= 100) affectionBonus = 1.06;
 
-                // 4. Calculate Final Stats
+                // Final Calculation
                 const finalHp = Math.floor(baseHp * levelMultiplier * affectionBonus);
                 const finalFp = Math.floor(baseFp * levelMultiplier * affectionBonus);
                 const finalAa = Math.floor(baseAa * levelMultiplier * affectionBonus);
@@ -449,10 +446,18 @@ let shipyardBatch = 30;
             fetchMyDock();
         }
 
-        async function bulkRetireCommons() {
-            const commons = currentDockData.filter(item => item.ship.rarity === "Common");
-            if (commons.length === 0) return alert("No Common ships found in Dock.");
-            if (!confirm(`Retire all ${commons.length} Common ships?`)) return;
+async function bulkRetireCommons() {
+            // FIXED: Added .toLowerCase() to handle "Common" vs "common"
+            const commons = currentDockData.filter(item => 
+                item.ship.rarity && item.ship.rarity.toLowerCase() === "common"
+            );
+
+            if (commons.length === 0) {
+                alert("No Common quality ships found in the dockyard. (Check if your Ships are 'Common' or 'Rare')");
+                return;
+            }
+
+            if (!confirm(`Commander, shall we scrap all ${commons.length} Common ships?`)) return;
 
             for (const ship of commons) {
                 await fetch(`${API_URL}/collection/${ship.id}`, {
@@ -460,7 +465,7 @@ let shipyardBatch = 30;
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
             }
-            alert("Bulk Retirement complete.");
+            alert("Bulk Retirement successful.");
             fetchMyDock();
         }
     </script>
