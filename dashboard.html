@@ -79,19 +79,22 @@
             <button class="tab-btn" onclick="switchTab('tab-logistics', this)">Logistics</button>
         </div>
 
-        <div id="tab-command" class="tab-content active">
+<div id="tab-command" class="tab-content active">
+            
             <div class="panel" style="border-left: 4px solid var(--accent-gold);">
                 <h3 style="margin-top:0; color: var(--accent-gold);">⭐ Active Broadcast Fleet</h3>
-				<div class="panel" style="border-left: 4px solid var(--accent-cyan); margin-top: 15px;">
-                <h3 style="margin-top:0; color: var(--accent-cyan);">🌐 Global Fleet Tech Network</h3>
-                <p style="font-size:12px; color:var(--text-muted); margin-top:-10px;">Automated stat bonuses from unique Level 120 Kansen.</p>
-                <div id="fleet-tech-display" style="display: flex; gap: 15px; flex-wrap: wrap; font-weight: bold; font-size: 14px;">
-                    </div>
-            </div>
                 <div id="fleet-container" style="display: flex; flex-wrap: wrap; gap: 15px; min-height: 80px;">
                     <p style="color: var(--text-muted); margin: auto;">No ships assigned.</p>
                 </div>
             </div>
+
+            <div class="panel" style="border-left: 4px solid var(--accent-cyan);">
+                <h3 style="margin-top:0; color: var(--accent-cyan);">🌐 Global Fleet Tech Network</h3>
+                <p style="font-size:12px; color:var(--text-muted); margin-top:-10px;">Total Global Fleet Technology Synchronization</p>
+                <div id="fleet-tech-display" style="display: flex; gap: 15px; flex-wrap: wrap; font-weight: bold; font-size: 14px;">
+                    </div>
+            </div>
+
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <div style="display:flex; align-items: center; gap: 20px;">
                     <h3 style="margin:0; color:var(--accent-cyan)">Personal Dock</h3>
@@ -104,9 +107,10 @@
                     🗑️ Bulk Retire Commons
                 </button>
             </div>
+            
             <div id="dock-container" class="grid-container"></div>
         </div>
-
+		
         <div id="tab-shipyard" class="tab-content">
             <div class="panel">
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
@@ -629,9 +633,6 @@
                 <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">🐟 TRP: <span style="color:var(--accent-cyan)">+${techTotals.trp}</span></div>
                 <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">⏱️ RLD: <span style="color:var(--success)">+${techTotals.rld}</span></div>
             `;
-            
-            // Also update the UI label
-            document.querySelector('#tab-command .panel:nth-child(2) p').innerText = "Total Global Fleet Technology Synchronization";
             
             return techTotals;
         }
