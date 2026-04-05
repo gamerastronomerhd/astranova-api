@@ -521,12 +521,7 @@ body.historical-theme .ship-name {
             align-items: center;
             gap: 6px;
         }
-        .donate-btn-top:hover {
-            background: var(--accent-cyan);
-            color: #0b0f19;
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
-            transform: translateY(-1px);
-        }
+
 .donate-btn-top {
             background: rgba(0, 242, 254, 0.1);
             border: 1px solid var(--accent-cyan);
@@ -559,4 +554,27 @@ body.historical-theme .ship-name {
     margin-top: 50px; 
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
     clear: both; 
+}
+
+.compliance-footer a {
+    color: var(--accent-cyan);
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.compliance-footer .donate-btn {
+    background: transparent;
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 15px;
+    transition: all 0.2s;
+}
+
+.compliance-footer .donate-btn:hover {
+    background: rgba(34, 211, 238, 0.1); /* Using the cyan hex with opacity */
 }
