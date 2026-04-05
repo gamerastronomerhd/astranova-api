@@ -1,0 +1,506 @@
+:root {
+    --bg-dark: #0f172a;
+    --card-bg: #1e293b;
+    --accent-cyan: #22d3ee;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+/* Header Styling */
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: rgba(15, 23, 42, 0.9);
+    border-bottom: 1px solid #334155;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.logo span {
+    color: var(--accent-cyan);
+}
+
+.stats {
+    font-size: 0.9rem;
+    color: var(--accent-cyan);
+    font-weight: 600;
+}
+
+/* The Grid System */
+.dashboard {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.fleet-grid {
+    display: grid;
+    /* This creates a responsive grid where cards are at least 120px wide */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Individual Ship Cards */
+.ship-card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 0.5rem;
+}
+
+.ship-card:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(34, 211, 238, 0.2);
+}
+
+.ship-icon {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Keeps the square shape perfect */
+    object-fit: cover;
+    background-color: #0f172a; /* Fallback color while loading */
+    border-bottom: 2px solid #334155;
+}
+
+.ship-name {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 0 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+/* Control Panel Styling */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background-color: rgba(30, 41, 59, 0.5);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+
+.filter-input, .filter-dropdown {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    border: 1px solid #475569;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    outline: none;
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 200px;
+    transition: border-color 0.2s;
+}
+
+.filter-input:focus, .filter-dropdown:focus {
+    border-color: var(--accent-cyan);
+}
+/* Commander Dossier Modal */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    
+    /* The Gold Standard Setup */
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-backdrop.hidden {
+    opacity: 0;
+    visibility: hidden; /* This completely destroys the invisible wall */
+    pointer-events: none; /* Backup safety measure */
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    width: 90%;
+    max-width: 900px;
+    height: 80vh;
+    border-radius: 12px;
+    border: 1px solid var(--accent-cyan);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #ef4444;
+}
+
+.dossier-layout {
+    display: flex;
+    height: 100%;
+}
+
+.dossier-art-container {
+    flex: 1;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.dossier-art {
+    max-height: 95%;
+    max-width: 95%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.2));
+}
+
+.dossier-intel {
+    flex: 1;
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.dossier-title {
+    font-size: 2.5rem;
+    color: var(--accent-cyan);
+    margin-bottom: 1rem;
+}
+
+.dossier-tags {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tag {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.faction-tag { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+.type-tag { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+
+.dossier-stats h3 {
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid #334155;
+    padding-bottom: 0.5rem;
+}
+/* --- Dossier Header & Toggle Switch --- */
+.dossier-header {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    z-index: 20;
+}
+
+.theme-switch {
+    display: inline-block;
+    position: relative;
+    width: 200px;
+    height: 34px;
+    cursor: pointer;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #0f172a;
+    border: 1px solid var(--accent-cyan);
+    border-radius: 34px;
+    transition: .4s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+}
+
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 90px;
+    left: 3px;
+    bottom: 3px;
+    background-color: rgba(34, 211, 238, 0.2);
+    border-radius: 34px;
+    transition: .4s;
+}
+
+input:checked + .slider::before {
+    transform: translateX(100px);
+    background-color: rgba(212, 163, 115, 0.3); /* Sepia tone indicator */
+}
+
+input:checked + .slider {
+    border-color: #d4a373;
+}
+
+.slider-text {
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    z-index: 1;
+    transition: color 0.3s;
+}
+
+.game-text { color: var(--accent-cyan); }
+.history-text { color: #475569; }
+
+input:checked + .slider .game-text { color: #475569; }
+input:checked + .slider .history-text { color: #d4a373; }
+
+/* --- View Transitions --- */
+.dossier-body {
+    height: 100%;
+    position: relative;
+}
+
+.view-game, .view-history {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.active-view {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* --- Historical Archive Aesthetics --- */
+.modal-content.is-historical {
+    border-color: #d4a373;
+    box-shadow: 0 10px 30px rgba(212, 163, 115, 0.2);
+}
+
+.view-history {
+    background-color: #f4ecd8; /* Old paper color */
+    color: #2c2a25; /* Faded ink */
+    font-family: 'Courier New', Courier, monospace; /* Typewriter font */
+}
+
+.history-art-container {
+    flex: 1;
+    position: relative;
+    border-right: 2px solid #d4a373;
+    overflow: hidden;
+}
+
+.history-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(0.6) grayscale(1) contrast(1.2); /* Makes any photo look old */
+}
+
+.photo-texture {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/dust.png'); /* Subtle dust */
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.history-intel {
+    flex: 1;
+    padding: 4rem 3rem;
+    position: relative;
+}
+
+.classified-stamp {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #c0392b;
+    border: 3px solid #c0392b;
+    padding: 5px 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transform: rotate(15deg);
+    opacity: 0.7;
+    letter-spacing: 2px;
+}
+
+.history-title {
+    font-size: 2.5rem;
+    border-bottom: 2px dashed #a89f91;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.history-specs {
+    list-style: none;
+    margin-bottom: 30px;
+    line-height: 1.8;
+}
+
+.history-logs h3 {
+    margin-bottom: 15px;
+    text-decoration: underline;
+}
+/* ==========================================
+   THE LANDSCAPE DOSSIER LAYOUT 
+========================================== */
+.view-history {
+    flex-direction: column; /* This forces the top/bottom landscape stack */
+    background-color: #e8dcc4; 
+    background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+    color: #2c2a25; 
+    font-family: 'Courier New', Courier, monospace; 
+}
+
+.history-art-container {
+    flex: none;
+    height: 55%; /* Image takes the top 55% */
+    width: 100%;
+    border-right: none;
+    border-bottom: 3px solid #8b2626; /* Crimson archive line */
+    position: relative;
+    overflow: hidden;
+}
+
+.history-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center; /* Keeps the ship centered */
+    filter: sepia(0.6) grayscale(0.8) contrast(1.2) opacity(0.9); 
+}
+
+.history-intel {
+    flex: none;
+    height: 45%; /* Text takes the bottom 45% */
+    padding: 2rem 3rem;
+    overflow-y: auto; /* Allows scrolling if the history gets long */
+    position: relative;
+}
+
+.classified-stamp {
+    position: absolute;
+    top: 15px;
+    right: 30px;
+    color: #c0392b;
+    border: 3px solid #c0392b;
+    padding: 5px 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transform: rotate(15deg);
+    opacity: 0.6;
+    letter-spacing: 2px;
+    pointer-events: none;
+}
+
+/* ==========================================
+   GLOBAL HISTORICAL OVERRIDE 
+========================================== */
+/* When the body has this class, the whole page turns into an archive */
+body.historical-theme {
+    --bg-dark: #d5c7a3;
+    --card-bg: #e8dcc4;
+    --text-main: #2c2a25;
+    --text-muted: #5c5549;
+    --accent-cyan: #8b2626; /* Replaces neon cyan with crimson ink */
+    background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+    font-family: 'Courier New', Courier, monospace;
+}
+
+body.historical-theme .top-nav {
+    background-color: rgba(213, 199, 163, 0.95);
+    border-bottom: 2px solid #8b2626;
+}
+
+body.historical-theme .filter-input, 
+body.historical-theme .filter-dropdown {
+    border-color: #a89f91;
+    font-weight: bold;
+}
+
+body.historical-theme .ship-card {
+    border: 1px solid #a89f91;
+    border-radius: 2px; /* Makes them look like polaroids/files */
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+body.historical-theme .ship-icon {
+    /* Instantly ages all your square icons */
+    filter: sepia(0.7) grayscale(0.6) contrast(1.1);
+    border-bottom: 1px solid #a89f91;
+}
+
+body.historical-theme .ship-name {
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Specific styling for the master toggle to make it fit in the header */
+.global-switch {
+    margin-right: auto; /* Pushes the search bar to the right */
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
