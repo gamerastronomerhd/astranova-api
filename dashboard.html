@@ -54,6 +54,35 @@
         .td-ship { text-align: left; display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 13px; }
         .td-ship img { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; border: 1px solid #334155; }
         .stat-highlight { color: var(--accent-cyan); font-weight: bold; }
+		
+		.compliance-footer {
+            position: absolute;
+            bottom: 15px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            width: 100%;
+        }
+        .compliance-footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            margin: 0 5px;
+        }
+        .donate-btn {
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+        .donate-btn:hover {
+            background: rgba(0, 242, 254, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -703,5 +732,17 @@
             return techTotals;
         }
     </script>
+<div class="compliance-footer">
+        <p>AstraNova Fleet Data Protocol © 2026</p>
+        <p>
+            <a href="#">Terms of Service</a> | 
+            <a href="#">Privacy Policy</a> | 
+            <a href="#">Refund Policy</a>
+        </p>
+        <p>Support: commander@astranova.com</p>
+        <button class="donate-btn" onclick="window.location.href='YOUR_STRIPE_PAYMENT_LINK_HERE'">
+            ☕ Support the Archive
+        </button>
+    </div>
 </body>
 </html>
