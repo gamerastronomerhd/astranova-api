@@ -236,7 +236,8 @@
                         errorDiv.innerText = "Invalid credentials.";
                     }
                 } else {
-                    const res = await fetch(`${API_URL}/users/`, {
+                    // 🚨 THE FIX IS HERE: Changed /users/ to /register
+                    const res = await fetch(`${API_URL}/register`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username: user, password: pass })
