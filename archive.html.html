@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstraNova | Fleet Command</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="top-nav">
+        <div class="logo">AstraNova <span>Command</span></div>
+        <div class="stats">
+            <span id="fleet-count">Loading Fleet...</span>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <section class="controls">
+			<label class="theme-switch global-switch" title="Toggle Classified Archive Mode">
+                <input type="checkbox" id="global-history-toggle">
+                <div class="slider">
+                    <span class="slider-text game-text">SYSTEM</span>
+                    <span class="slider-text history-text">ARCHIVE</span>
+                </div>
+            </label>
+			
+            <input type="text" id="search-bar" placeholder="Search fleet..." class="filter-input">
+            
+            <select id="filter-faction" class="filter-dropdown">
+                <option value="all">All Factions</option>
+                <option value="Eagle Union">Eagle Union</option>
+                <option value="Royal Navy">Royal Navy</option>
+                <option value="Sakura Empire">Sakura Empire</option>
+                <option value="Iron Blood">Iron Blood</option>
+                <option value="Dragon Empery">Dragon Empery</option>
+                <option value="Sardegna Empire">Sardegna Empire</option>
+                <option value="Iris Libre">Iris Libre</option>
+                <option value="Vichya Dominion">Vichya Dominion</option>
+                <option value="Northern Parliament">Northern Parliament</option>
+            </select>
+
+            <select id="filter-type" class="filter-dropdown">
+                <option value="all">All Hull Types</option>
+                <option value="Destroyer">Destroyer</option>
+                <option value="Light Cruiser">Light Cruiser</option>
+                <option value="Heavy Cruiser">Heavy Cruiser</option>
+                <option value="Battleship">Battleship</option>
+                <option value="Aircraft Carrier">Aircraft Carrier</option>
+                <option value="Submarine">Submarine</option>
+            </select>
+
+            <select id="sort-order" class="filter-dropdown">
+                <option value="az">Alphabetical (A-Z)</option>
+                <option value="za">Alphabetical (Z-A)</option>
+            </select>
+        </section>
+
+        <div id="fleet-grid" class="fleet-grid"></div>
+    </main>
+
+    <div id="dossier-modal" class="modal-backdrop hidden">
+        <div class="modal-content" id="modal-container">
+            <button id="close-modal" class="close-btn">&times;</button>
+            
+            <div class="dossier-header">
+                <label class="theme-switch">
+                    <input type="checkbox" id="history-toggle">
+                    <div class="slider">
+                        <span class="slider-text game-text">Game Data</span>
+                        <span class="slider-text history-text">Historical</span>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="dossier-body">
+                
+                <div class="dossier-layout view-game active-view">
+                    <div class="dossier-art-container">
+                        <img id="dossier-art" src="" alt="Ship Artwork" class="dossier-art">
+                    </div>
+                    <div class="dossier-intel">
+                        <h2 id="dossier-name" class="dossier-title">Ship Name</h2>
+                        <div class="dossier-tags">
+                            <span id="dossier-faction" class="tag faction-tag">Faction</span>
+                            <span id="dossier-type" class="tag type-tag">Hull Type</span>
+                        </div>
+                        <div class="dossier-stats">
+                            <h3>Operational Intel</h3>
+                            <p>Detailed fleet integration stats and tactical history will be routed here once the database is expanded.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dossier-layout view-history">
+                    <div class="history-art-container">
+                        <img id="history-art" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/USS_Juneau_%28CL-52%29_in_New_York_Harbor_on_1_June_1942.jpg/800px-USS_Juneau_%28CL-52%29_in_New_York_Harbor_on_1_June_1942.jpg" alt="Historical Photo" class="history-photo">
+                        <div class="photo-texture"></div> 
+                    </div>
+                    <div class="history-intel">
+                        <div class="classified-stamp">DECLASSIFIED</div>
+                        <h2 id="history-name" class="history-title">Ship Name</h2>
+                        <ul class="history-specs">
+                            <li><strong>Launched:</strong> <span id="hist-launch">Unknown</span></li>
+                            <li><strong>Class:</strong> <span id="hist-class">Unknown</span></li>
+                            <li><strong>Fate:</strong> <span id="hist-fate">Unknown</span></li>
+                        </ul>
+                        <div class="history-logs">
+                            <h3>Service Records</h3>
+                            <p id="hist-bio">Historical combat records and service history will be appended here from the database.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
