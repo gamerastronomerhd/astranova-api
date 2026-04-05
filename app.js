@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchFleetData() {
     try {
-        // ADDED painting_url to the select list!
         const response = await fetch(`${SUPABASE_URL}/rest/v1/ships?select=id,name,icon_url,painting_url,faction,hull_type&icon_url=not.is.null`, {
             method: 'GET',
             headers: HEADERS
@@ -52,16 +51,11 @@ async function fetchFleetData() {
 // EVENT LISTENERS & LOGIC
 // ==========================================
 function setupEventListeners() {
-	console.log("📡 Initializing listeners..."); // LOG 1
+    console.log("📡 Initializing listeners..."); 
 
     const search = document.getElementById('search-bar');
-    console.log("🔍 Search bar found:", search); // LOG 2
-
-    const globalTog = document.getElementById('global-history-toggle');
-    console.log("🌎 Global toggle found:", globalTog); // LOG 3
-
-    if (search) search.addEventListener('input', applyFiltersAndSort);
-    // We add ?. to make sure the script doesn't crash if the ID is missing
+    
+    // Filters
     document.getElementById('search-bar')?.addEventListener('input', applyFiltersAndSort);
     document.getElementById('filter-faction')?.addEventListener('change', applyFiltersAndSort);
     document.getElementById('filter-type')?.addEventListener('change', applyFiltersAndSort);
@@ -72,12 +66,14 @@ function setupEventListeners() {
     // 1. Close via the "X" button
     closeModalBtn?.addEventListener('click', () => {
         modal.classList.add('hidden');
+        document.getElementById('dossier-art').src = ''; // 🚨 ABORT SWITCH: KILLS PENDING DOWNLOADS
     });
 
     // 2. Close via clicking the dark background
     modal?.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.classList.add('hidden');
+            document.getElementById('dossier-art').src = ''; // 🚨 ABORT SWITCH: KILLS PENDING DOWNLOADS
         }
     });
 
@@ -87,18 +83,8 @@ function setupEventListeners() {
         document.body.classList.toggle('historical-theme', e.target.checked);
     });
 
-    console.log("✅ Listeners attached successfully!"); // LOG 4
+    console.log("✅ Listeners attached successfully!"); 
 }
-
-    // Theme Toggles
-    historyToggle.addEventListener('change', toggleDossierView);
-    globalHistoryToggle.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            document.body.classList.add('historical-theme');
-        } else {
-            document.body.classList.remove('historical-theme');
-        }
-    });
 
 function applyFiltersAndSort() {
     try {
@@ -172,7 +158,6 @@ function getHistoricalPrefix(faction) {
 }
 
 function toggleDossierView(e) {
-    // If we pass an event (e), check its target. Otherwise, use the checkbox's state.
     const isChecked = e ? e.target.checked : historyToggle.checked;
     
     if (isChecked) {
@@ -195,14 +180,32 @@ function openDossier(ship) {
     document.getElementById('dossier-faction').textContent = ship.faction || 'Unknown';
     document.getElementById('dossier-type').textContent = ship.hull_type || 'Unknown';
     
-    // NEW LOGIC: Use your R2 storage painting first. If it's missing, fall back to MrLar.
-    const fallbackArtUrl = `https://azurlane.mrlar.dev/images/ships/${ship.name.toLowerCase().replace(/ /g, '_')}.png`;
-    
-    // This prioritizes your new cloudflare database!
-    document.getElementById('dossier-art').src = ship.painting_url || fallbackArtUrl;
-    
     const prefix = getHistoricalPrefix(ship.faction);
     document.getElementById('history-name').textContent = `${prefix}${ship.name}`;
+
+    // --- PROGRESSIVE LOADING ENGINE ---
+    const artImg = document.getElementById('dossier-art');
+    
+    // 1. Instant Feedback: Use the small icon, stretch it, and dim it
+    artImg.src = ship.icon_url; 
+    artImg.style.opacity = '0.4';
+    artImg.style.transition = 'opacity 0.4s ease-in-out';
+
+    // 2. Determine the High-Res Target
+    const fallbackArtUrl = `https://azurlane.mrlar.dev/images/ships/${ship.name.toLowerCase().replace(/ /g, '_')}.png`;
+    const targetHighResUrl = ship.painting_url || fallbackArtUrl;
+
+    // 3. Load the heavy image stealthily in the background
+    const heavyImage = new Image();
+    heavyImage.src = targetHighResUrl;
+
+    heavyImage.onload = () => {
+        // 4. Safety Check: Only swap if the user hasn't closed or clicked a new ship!
+        if (!modal.classList.contains('hidden') && document.getElementById('dossier-name').textContent === ship.name) {
+            artImg.src = heavyImage.src; // Swap to the crisp image
+            artImg.style.opacity = '1';  // Fade it in brilliantly
+        }
+    };
     
     modal.classList.remove('hidden');
 }
