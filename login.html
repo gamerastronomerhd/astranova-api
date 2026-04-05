@@ -143,16 +143,13 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 		
-		.compliance-footer {
-            /* Removed absolute positioning */
+.compliance-footer {
+            position: absolute; /* Puts it back at the bottom of the screen */
+            bottom: 20px;
             text-align: center;
             font-size: 11px;
             color: var(--text-muted);
             width: 100%;
-            padding: 40px 0 20px 0; /* Creates breathing room */
-            margin-top: 50px; /* Pushes it away from the content above */
-            border-top: 1px solid rgba(255, 255, 255, 0.05); /* Adds a sleek separator line */
-            clear: both; /* Guarantees it stays at the absolute bottom */
         }
     </style>
 </head>
