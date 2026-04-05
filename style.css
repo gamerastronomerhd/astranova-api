@@ -504,3 +504,26 @@ body.historical-theme .ship-name {
     margin-right: auto; /* Pushes the search bar to the right */
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
+
+.donate-btn-top {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 6px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+            margin-right: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .donate-btn-top:hover {
+            background: var(--accent-cyan);
+            color: #0b0f19;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+            transform: translateY(-1px);
+        }
