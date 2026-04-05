@@ -144,12 +144,36 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 		
 .compliance-footer {
-            position: absolute; /* Puts it back at the bottom of the screen */
+            position: absolute; 
             bottom: 20px;
+            left: 0; /* This forces it to span the entire screen properly! */
             text-align: center;
             font-size: 11px;
             color: var(--text-muted);
             width: 100%;
+        }
+
+        .compliance-footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .donate-btn {
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+
+        .donate-btn:hover {
+            background: rgba(0, 242, 254, 0.1);
         }
     </style>
 </head>
