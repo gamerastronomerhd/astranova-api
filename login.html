@@ -176,7 +176,7 @@
         </div>
     </div>
 
-    <script>
+<script>
         const API_URL = "https://astranova-api.onrender.com";
         let isLogin = true;
 
@@ -200,10 +200,9 @@
                 return;
             }
 
-            // UI Feedback
             btnText.style.display = 'none';
             spinner.style.display = 'block';
-            errorDiv.innerText = "";
+            errorDiv.innerText = "Connecting... (This may take 50s if server is waking up)";
 
             try {
                 if (isLogin) {
@@ -236,18 +235,19 @@
                         toggleView();
                     } else {
                         const data = await res.json();
-                        errorDiv.innerText = data.detail || "Registration failed.";
+                        errorDiv.innerText = data.detail || "Registration failed. Username may exist.";
+                        console.error("API Error Response:", data);
                     }
                 }
             } catch (err) {
-                errorDiv.innerText = "Connection lost. Check API status.";
+                console.error("Fetch failed:", err);
+                errorDiv.innerText = "Connection failed. Check console (F12) for CORS or timeout errors.";
             } finally {
                 btnText.style.display = 'block';
                 spinner.style.display = 'none';
             }
         }
 
-        // Enter key support
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleAuth();
         });
