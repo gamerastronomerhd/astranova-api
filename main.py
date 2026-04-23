@@ -69,8 +69,6 @@ app = FastAPI(
     version="1.2.1"
 )
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 class UserCreate(BaseModel):
     username: str
     password: str
@@ -118,7 +116,7 @@ def root_status():
     return {"status": "online", "project": "AstraNova"}
 
 # --- NEW: THE POST REQUEST ---
-@app.post("/ships/")
+@app.post("/ships/", response_model=schemas.ShipResponse)
 def create_ship(ship: schemas.ShipCreate, db: Session = Depends(get_db)):
     # 1. Translate the incoming API data (Pydantic) into a Database row (SQLAlchemy)
     db_ship = models.Ship(
@@ -150,7 +148,7 @@ def read_ships(db: Session = Depends(get_db)):
     return ships
 
 # --- NEW: PATCH Route to Update the Image ---
-@app.patch("/ships/{ship_id}/icon/")
+@app.patch("/ships/{ship_id}/icon/", response_model=schemas.ShipResponse)
 def update_ship_icon(ship_id: int, icon_data: schemas.ShipIconUpdate, db: Session = Depends(get_db)):
     # 1. Find the specific ship in the database
     db_ship = db.query(models.Ship).filter(models.Ship.id == ship_id).first()

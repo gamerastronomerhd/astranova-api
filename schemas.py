@@ -114,8 +114,8 @@ class CollectionResponse(BaseModel):
     eq4: Optional[EquipmentResponse] = None
     eq5: Optional[EquipmentResponse] = None
 
-class Config:
-    from_attributes = True
+    class Config:
+        from_attributes = True
 
 # 4. USER SCHEMAS
 class UserCreate(BaseModel):

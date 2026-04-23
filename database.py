@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 # The os.getenv command looks for the cloud database first. 
 # If it fails (because you are on your local PC), it uses your local string instead!
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:q2ZeF3XV@localhost:5432/astranova_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:LOCAL_PASSWORD@localhost:5432/astranova_db")
 
 # Sometimes cloud providers use 'postgres://' but SQLAlchemy requires 'postgresql://'
 if DATABASE_URL.startswith("postgres://"):
