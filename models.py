@@ -112,3 +112,13 @@ class MyCollection(Base):
     eq3 = relationship("Equipment", foreign_keys=[slot_3])
     eq4 = relationship("Equipment", foreign_keys=[slot_4])
     eq5 = relationship("Equipment", foreign_keys=[slot_5])
+    
+class ShipSkin(Base):
+    __tablename__ = "ship_skins"
+    id = Column(Integer, primary_key=True, index=True)
+    ship_id = Column(Integer, ForeignKey("ships.id"))
+    name = Column(String) # e.g., "Default", "Beachside Vacation", "L2D"
+    painting_url = Column(String)
+
+    # This links it back to the main ship
+    ship = relationship("Ship", back_populates="skins")

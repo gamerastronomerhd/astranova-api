@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchFleetData() {
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/ships?select=id,name,icon_url,painting_url,faction,hull_type&icon_url=not.is.null`, {
+        // ADDED 'rarity' TO THE SELECT QUERY RIGHT AFTER 'name'
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/ships?select=id,name,rarity,icon_url,painting_url,faction,hull_type&icon_url=not.is.null`, {
             method: 'GET',
             headers: HEADERS
         });
