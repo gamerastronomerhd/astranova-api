@@ -219,7 +219,23 @@ body {
 }
 
 .scale-massive {
-    transform: scale(1.35); /* Ultra Rare, Decisive */
+    transform: scale(1.75); /* Ultra Rare, Decisive */
+}
+
+/* Dynamic Hover States */
+.scale-normal:hover {
+    transform: scale(1.20);
+    cursor: zoom-in;
+}
+
+.scale-large:hover {
+    transform: scale(1.45);
+    cursor: zoom-in;
+}
+
+.scale-massive:hover {
+    transform: scale(2.00);
+    cursor: zoom-in;
 }
 
 .dossier-intel {
@@ -536,20 +552,4 @@ body.historical-theme .ship-name {
 
 .compliance-footer .donate-btn:hover {
     background: rgba(34, 211, 238, 0.1); /* Using the cyan hex with opacity */
-}
-
-/* Dynamic Hover States */
-.scale-normal:hover {
-    transform: scale(1.20);
-    cursor: zoom-in;
-}
-
-.scale-large:hover {
-    transform: scale(1.45);
-    cursor: zoom-in;
-}
-
-.scale-massive:hover {
-    transform: scale(1.55);
-    cursor: zoom-in;
 }
