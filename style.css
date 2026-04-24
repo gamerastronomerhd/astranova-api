@@ -201,8 +201,8 @@ body {
 }
 
 .dossier-art {
-    max-height: 95%;
-    max-width: 95%;
+    width: 120%; /* Forces the canvas to overflow the container horizontally */
+    height: 120%; /* Forces the canvas to overflow vertically */
     object-fit: contain;
     filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.2));
 }
