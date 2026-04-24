@@ -339,52 +339,12 @@ input:checked + .slider .history-text { color: #d4a373; }
     box-shadow: 0 10px 30px rgba(212, 163, 115, 0.2);
 }
 
-.view-history {
-    background-color: #f4ecd8; /* Old paper color */
-    color: #2c2a25; /* Faded ink */
-    font-family: 'Courier New', Courier, monospace; /* Typewriter font */
-}
-
-.history-art-container {
-    flex: 1;
-    position: relative;
-    border-right: 2px solid #d4a373;
-    overflow: hidden;
-}
-
-.history-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: sepia(0.6) grayscale(1) contrast(1.2); /* Makes any photo look old */
-}
-
 .photo-texture {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
     background: url('https://www.transparenttextures.com/patterns/dust.png'); /* Subtle dust */
     opacity: 0.6;
     pointer-events: none;
-}
-
-.history-intel {
-    flex: 1;
-    padding: 4rem 3rem;
-    position: relative;
-}
-
-.classified-stamp {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    color: #c0392b;
-    border: 3px solid #c0392b;
-    padding: 5px 15px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    transform: rotate(15deg);
-    opacity: 0.7;
-    letter-spacing: 2px;
 }
 
 .history-title {
@@ -504,46 +464,30 @@ body.historical-theme .ship-name {
     margin-right: auto; /* Pushes the search bar to the right */
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
-
+	
 .donate-btn-top {
-            background: rgba(0, 242, 254, 0.1);
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            padding: 6px 15px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.2s;
-            margin-right: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 6px 15px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.2s;
+    margin-right: 15px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
 
-.donate-btn-top {
-            background: rgba(0, 242, 254, 0.1);
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            padding: 6px 15px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.2s;
-            margin-right: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .donate-btn-top:hover {
-            background: var(--accent-cyan);
-            color: #0b0f19;
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
-            transform: translateY(-1px);
-        }
+.donate-btn-top:hover {
+    background: var(--accent-cyan);
+    color: #0b0f19;
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+    transform: translateY(-1px);
+}
 		
 .compliance-footer {
     text-align: center;

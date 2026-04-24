@@ -126,7 +126,10 @@ function renderGrid(ships) {
         img.className = 'ship-icon';
         img.src = ship.icon_url;
         img.alt = ship.name;
-        img.onerror = null;
+        img.onerror = function() {
+            this.onerror = null; 
+            this.src = 'https://placehold.co/100x100/1e293b/00f2fe?text=?';
+        };
 
         const nameLabel = document.createElement('div');
         nameLabel.className = 'ship-name';
@@ -182,6 +185,12 @@ function openDossier(ship) {
     
     const prefix = getHistoricalPrefix(ship.faction);
     document.getElementById('history-name').textContent = `${prefix}${ship.name}`;
+	
+	// Update Historical Photo
+    const histArtImg = document.getElementById('history-art');
+    // If your database eventually has a 'historical_photo_url', it will use it. 
+    // Otherwise, it defaults to a standard placeholder.
+    histArtImg.src = ship.historical_photo_url || 'https://www.transparenttextures.com/patterns/black-linen.png';
 
     // --- PROGRESSIVE LOADING ENGINE ---
     const artImg = document.getElementById('dossier-art');
@@ -208,4 +217,8 @@ function openDossier(ship) {
     };
     
     modal.classList.remove('hidden');
+}
+function logout() { 
+    localStorage.removeItem('astra_token'); 
+    window.location.href = 'login.html'; 
 }
