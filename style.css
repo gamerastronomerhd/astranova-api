@@ -553,3 +553,62 @@ body.historical-theme .ship-name {
 .compliance-footer .donate-btn:hover {
     background: rgba(34, 211, 238, 0.1); /* Using the cyan hex with opacity */
 }
+/* ==========================================
+   WARDROBE CONTROLS
+========================================== */
+.dossier-art-container {
+    position: relative; /* Ensures the absolute buttons stay inside the art box */
+}
+
+.skin-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(15, 23, 42, 0.6);
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan);
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 30;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.skin-nav-btn:hover {
+    background: var(--accent-cyan);
+    color: #0f172a;
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.skin-prev { left: 15px; }
+.skin-next { right: 15px; }
+
+.skin-name-label {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid #334155;
+    color: var(--text-main);
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    z-index: 30;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    text-transform: uppercase;
+    pointer-events: none; /* Lets you click through it to the art */
+}
+
+/* Ensure hidden class completely removes them if ship has 1 skin */
+.hidden { display: none !important; }

@@ -86,8 +86,12 @@
                 
                 <div class="dossier-layout view-game active-view">
                     <div class="dossier-art-container">
-                        <img id="dossier-art" src="" alt="Ship Artwork" class="dossier-art">
-                    </div>
+						<button class="skin-nav-btn skin-prev hidden" onclick="prevSkin()">&#10094;</button>
+						<button class="skin-nav-btn skin-next hidden" onclick="nextSkin()">&#10095;</button>
+						<div class="skin-name-label hidden" id="skin-name-label">Default</div>
+    
+						<img id="dossier-art" class="dossier-art" src="" alt="Ship Art">
+					</div>
                     <div class="dossier-intel">
                         <h2 id="dossier-name" class="dossier-title">Ship Name</h2>
                         <div class="dossier-tags">

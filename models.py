@@ -20,6 +20,7 @@ class Ship(Base):
     # Relationships
     stats = relationship("ShipBaseStats", back_populates="ship", uselist=False)
     collection_entries = relationship("MyCollection", back_populates="ship")
+    skins = relationship("ShipSkin", back_populates="ship")
 
 class ShipBaseStats(Base):
     __tablename__ = "ship_base_stats"

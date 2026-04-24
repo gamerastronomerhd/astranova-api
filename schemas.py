@@ -50,9 +50,19 @@ class ShipStats(ShipStatsCreate):
     class Config:
         from_attributes = True
 
+class ShipSkinResponse(BaseModel):
+    id: int
+    name: str
+    painting_url: str
+
+    class Config:
+        from_attributes = True
+
 class ShipResponse(ShipCreate):
     id: int
     stats: Optional[ShipStats] = None 
+    skins: List[ShipSkinResponse] = [] # <-- THE NEW WARDROBE UPLINK
+    
     class Config:
         from_attributes = True
 

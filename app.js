@@ -11,6 +11,9 @@ const HEADERS = {
 };
 
 let masterFleet = []; 
+let currentSkins = [];
+let currentSkinIndex = 0;
+let currentShipName = "";
 
 // UI Elements
 const modal = document.getElementById('dossier-modal');
@@ -32,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchFleetData() {
     try {
         // ADDED 'rarity' TO THE SELECT QUERY RIGHT AFTER 'name'
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/ships?select=id,name,rarity,icon_url,painting_url,faction,hull_type&icon_url=not.is.null`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/ships?select=id,name,rarity,icon_url,painting_url,faction,hull_type,ship_skins(name,painting_url)&icon_url=not.is.null`, {
             method: 'GET',
             headers: HEADERS
         });
@@ -186,6 +189,7 @@ function openDossier(ship) {
     
     const prefix = getHistoricalPrefix(ship.faction);
     document.getElementById('history-name').textContent = `${prefix}${ship.name}`;
+	window.currentShipIcon = ship.icon_url;
 	
 	// Update Historical Photo
     const histArtImg = document.getElementById('history-art');
@@ -193,49 +197,100 @@ function openDossier(ship) {
     // Otherwise, it defaults to a standard placeholder.
     histArtImg.src = ship.historical_photo_url || 'https://www.transparenttextures.com/patterns/black-linen.png';
 
-    // --- PROGRESSIVE LOADING ENGINE ---
+    // --- PROGRESSIVE LOADING ENGINE & WARDROBE ---
     const artImg = document.getElementById('dossier-art');
+    currentShipName = ship.name;
 
-	// 1. DYNAMIC 3-TIER RARITY SCALING
-    // Strip away ALL old classes from the previous ship clicked
+    // 1. DYNAMIC 3-TIER RARITY SCALING
     artImg.classList.remove('scale-normal', 'scale-large', 'scale-massive');
-    
-    // Define the specific tiers
     const urRarities = ["Ultra Rare", "Decisive"];
     const ssrRarities = ["Super Rare", "Priority"];
     
-    // Apply the exact scale needed for their canvas size
     if (urRarities.includes(ship.rarity)) {
-        artImg.classList.add('scale-massive'); // Extreme zoom for URs
+        artImg.classList.add('scale-massive'); 
     } else if (ssrRarities.includes(ship.rarity)) {
-        artImg.classList.add('scale-large');   // Moderate zoom for SSRs
+        artImg.classList.add('scale-large');   
     } else {
-        artImg.classList.add('scale-normal');  // Gentle frame for standard ships
+        artImg.classList.add('scale-normal');  
     }
-	
-    // 1. Instant Feedback: Use the small icon, stretch it, and dim it
-    artImg.src = ship.icon_url; 
-    artImg.style.opacity = '0.4';
-    artImg.style.transition = 'opacity 0.4s ease-in-out';
 
-    // 2. Determine the High-Res Target
+    // 2. COMPILE THE WARDROBE
     const fallbackArtUrl = `https://azurlane.mrlar.dev/images/ships/${ship.name.toLowerCase().replace(/ /g, '_')}.png`;
-    const targetHighResUrl = ship.painting_url || fallbackArtUrl;
+    
+    // The base default skin is always Slot 0
+    currentSkins = [
+        { name: "Default", painting_url: ship.painting_url || fallbackArtUrl, is_base: true }
+    ];
 
-    // 3. Load the heavy image stealthily in the background
-    const heavyImage = new Image();
-    heavyImage.src = targetHighResUrl;
+    // Append any extra skins from the database
+    if (ship.ship_skins && ship.ship_skins.length > 0) {
+        currentSkins = currentSkins.concat(ship.ship_skins);
+    }
 
-    heavyImage.onload = () => {
-        // 4. Safety Check: Only swap if the user hasn't closed or clicked a new ship!
-        if (!modal.classList.contains('hidden') && document.getElementById('dossier-name').textContent === ship.name) {
-            artImg.src = heavyImage.src; // Swap to the crisp image
-            artImg.style.opacity = '1';  // Fade it in brilliantly
-        }
-    };
+    currentSkinIndex = 0;
+
+    // 3. UI TOGGLES
+    const prevBtn = document.querySelector('.skin-prev');
+    const nextBtn = document.querySelector('.skin-next');
+    const skinLabel = document.getElementById('skin-name-label');
+
+    if (currentSkins.length > 1) {
+        prevBtn.classList.remove('hidden');
+        nextBtn.classList.remove('hidden');
+        skinLabel.classList.remove('hidden');
+    } else {
+        prevBtn.classList.add('hidden');
+        nextBtn.classList.add('hidden');
+        skinLabel.classList.add('hidden');
+    }
+
+    // Load the first skin
+    loadCurrentSkin();
     
     modal.classList.remove('hidden');
 }
+
+// ==========================================
+// WARDROBE CONTROLS
+// ==========================================
+function nextSkin() {
+    if (currentSkins.length <= 1) return;
+    currentSkinIndex = (currentSkinIndex + 1) % currentSkins.length;
+    loadCurrentSkin();
+}
+
+function prevSkin() {
+    if (currentSkins.length <= 1) return;
+    currentSkinIndex = (currentSkinIndex - 1 + currentSkins.length) % currentSkins.length;
+    loadCurrentSkin();
+}
+
+function loadCurrentSkin() {
+    const artImg = document.getElementById('dossier-art');
+    const skinObj = currentSkins[currentSkinIndex];
+    
+    document.getElementById('skin-name-label').textContent = skinObj.name;
+
+    // Use icon_url temporarily ONLY if it's the base skin, otherwise just dim
+    if (skinObj.is_base && window.currentShipIcon) {
+        artImg.src = window.currentShipIcon; 
+    }
+    
+    artImg.style.opacity = '0.4';
+    artImg.style.transition = 'opacity 0.4s ease-in-out';
+
+    const heavyImage = new Image();
+    heavyImage.src = skinObj.painting_url;
+
+    heavyImage.onload = () => {
+        // Safety Check: Ensure the user hasn't closed the modal or clicked another ship/skin
+        if (!modal.classList.contains('hidden') && document.getElementById('dossier-name').textContent === currentShipName) {
+            artImg.src = heavyImage.src; 
+            artImg.style.opacity = '1';  
+        }
+    };
+}
+    
 function logout() { 
     localStorage.removeItem('astra_token'); 
     window.location.href = 'login.html'; 
