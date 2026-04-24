@@ -201,10 +201,14 @@ body {
 }
 
 .dossier-art {
-    width: 120%; /* Forces the canvas to overflow the container horizontally */
-    height: 120%; /* Forces the canvas to overflow vertically */
+    width: 100%; 
+    height: 100%;
     object-fit: contain;
+    /* This forces the bleed by blowing up the image by 25% AFTER flexbox places it */
+    transform: scale(1.25); 
     filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.2));
+    /* Smooth transition for when we hover */
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .dossier-intel {
@@ -521,4 +525,10 @@ body.historical-theme .ship-name {
 
 .compliance-footer .donate-btn:hover {
     background: rgba(34, 211, 238, 0.1); /* Using the cyan hex with opacity */
+}
+
+.dossier-art:hover {
+    /* Since base is 1.25, we bump this to 1.45 so the zoom is still noticeable */
+    transform: scale(1.45); 
+    cursor: zoom-in;
 }
