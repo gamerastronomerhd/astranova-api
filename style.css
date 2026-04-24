@@ -204,11 +204,18 @@ body {
     width: 100%; 
     height: 100%;
     object-fit: contain;
-    /* This forces the bleed by blowing up the image by 25% AFTER flexbox places it */
-    transform: scale(1.25); 
     filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.2));
-    /* Smooth transition for when we hover */
     transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* Notice we removed the hardcoded 'transform' from here! */
+}
+
+/* --- NEW: Dynamic Scale Classes --- */
+.scale-normal {
+    transform: scale(1.05); /* Just a tiny bump for Common/Rare/Elite */
+}
+
+.scale-massive {
+    transform: scale(1.35); /* The epic Gacha bleed for SSR/UR/PR/DR */
 }
 
 .dossier-intel {
@@ -527,8 +534,13 @@ body.historical-theme .ship-name {
     background: rgba(34, 211, 238, 0.1); /* Using the cyan hex with opacity */
 }
 
-.dossier-art:hover {
-    /* Since base is 1.25, we bump this to 1.45 so the zoom is still noticeable */
-    transform: scale(1.45); 
+/* Dynamic Hover States */
+.scale-normal:hover {
+    transform: scale(1.25);
+    cursor: zoom-in;
+}
+
+.scale-massive:hover {
+    transform: scale(1.45);
     cursor: zoom-in;
 }

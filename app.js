@@ -194,7 +194,22 @@ function openDossier(ship) {
 
     // --- PROGRESSIVE LOADING ENGINE ---
     const artImg = document.getElementById('dossier-art');
+
+    // 1. DYNAMIC RARITY SCALING
+    // Strip away old classes from the previous ship clicked
+    artImg.classList.remove('scale-normal', 'scale-massive');
     
+    // Check if the ship belongs to a high-rarity tier with massive artwork
+    const massiveRarities = ["Super Rare", "Ultra Rare", "Priority", "Decisive"];
+    if (massiveRarities.includes(ship.rarity)) {
+        artImg.classList.add('scale-massive');
+    } else {
+        artImg.classList.add('scale-normal');
+    }
+
+    // 2. Instant Feedback: Use the small icon, stretch it, and dim it
+    // ... (keep the rest of your existing image loading code here)
+	
     // 1. Instant Feedback: Use the small icon, stretch it, and dim it
     artImg.src = ship.icon_url; 
     artImg.style.opacity = '0.4';
