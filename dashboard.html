@@ -335,13 +335,23 @@
                 let trp = Math.floor(((s.torpedo ?? 0) + ((s.trp_120 ?? (s.torpedo ?? 0)) - (s.torpedo ?? 0)) * scale) * aff) + (item.bonus_trp || 0);
                 let finalRld = Math.floor((bRld + (mRld - bRld) * scale) * aff) + (item.bonus_rld || 0);
 
-                // APPLY THE GLOBAL FLEET TECH BONUSES
-                hp += globalTechBonuses.hp || 0;
-                fp += globalTechBonuses.fp || 0;
-                aa += globalTechBonuses.aa || 0;
-                avi += globalTechBonuses.avi || 0;
-                trp += globalTechBonuses.trp || 0;
-                finalRld += globalTechBonuses.rld || 0;
+                // APPLY THE GLOBAL FLEET TECH BONUSES (Filtered by Base Stats)
+				hp += globalTechBonuses.hp || 0; // Every ship gets HP
+				finalRld += globalTechBonuses.rld || 0; // Every ship gets Reload
+
+				// Only apply specific offensive tech if the ship actually utilizes that stat natively
+				if ((s.firepower || 0) > 0 || (s.fp_120 || 0) > 0) {
+				fp += globalTechBonuses.fp || 0;
+				}
+				if ((s.anti_air || 0) > 0 || (s.aa_120 || 0) > 0) {
+				aa += globalTechBonuses.aa || 0;
+				}
+				if ((s.aviation || 0) > 0 || (s.avi_120 || 0) > 0) {
+				avi += globalTechBonuses.avi || 0;
+				}
+				if ((s.torpedo || 0) > 0 || (s.trp_120 || 0) > 0) {
+				trp += globalTechBonuses.trp || 0;
+				}
 
                 const eva = Math.floor(((s.evasion ?? 0) + ((s.evasion_120 ?? (s.evasion ?? 0)) - (s.evasion ?? 0)) * scale) * aff);
                 const acc = Math.floor(((s.accuracy ?? 0) + ((s.accuracy_120 ?? (s.accuracy ?? 0)) - (s.accuracy ?? 0)) * scale) * aff);
