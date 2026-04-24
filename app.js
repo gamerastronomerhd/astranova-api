@@ -117,14 +117,46 @@ function applyFiltersAndSort() {
     }
 }
 
+// Helper function to match Azur Lane rarities to our CSS
+function getRarityClass(rarity) {
+    if (!rarity) return 'common';
+    const r = rarity.toLowerCase();
+    if (r.includes('normal') || r.includes('common')) return 'common';
+    if (r.includes('rare') && !r.includes('super') && !r.includes('ultra')) return 'rare';
+    if (r.includes('elite')) return 'elite';
+    if (r.includes('super rare') || r.includes('priority')) return 'ssr';
+    if (r.includes('ultra rare') || r.includes('decisive')) return 'ur';
+    return 'common';
+}
+
 function renderGrid(ships) {
     const grid = document.getElementById('fleet-grid');
     grid.innerHTML = ''; 
 
     ships.forEach(ship => {
         const card = document.createElement('div');
-        card.className = 'ship-card';
+        
+        // Apply the base card class AND the specific rarity color class
+        const rarityClass = getRarityClass(ship.rarity);
+        card.className = `ship-card rarity-${rarityClass}`;
+        
         card.addEventListener('click', () => openDossier(ship));
+
+        // NEW: Create the Rarity Badge
+        const rarityLabel = document.createElement('div');
+        rarityLabel.className = 'rarity-label';
+        
+        // Shorten names for a cleaner UI fit
+        let displayRarity = ship.rarity || 'Unknown';
+        if (displayRarity === "Super Rare") displayRarity = "SSR";
+        if (displayRarity === "Ultra Rare") displayRarity = "UR";
+        if (displayRarity === "Priority") displayRarity = "PR";
+        if (displayRarity === "Decisive") displayRarity = "DR";
+        if (displayRarity === "Normal") displayRarity = "N";
+        if (displayRarity === "Rare") displayRarity = "R";
+        if (displayRarity === "Elite") displayRarity = "E";
+        
+        rarityLabel.textContent = displayRarity;
 
         const img = document.createElement('img');
         img.className = 'ship-icon';
@@ -139,12 +171,13 @@ function renderGrid(ships) {
         nameLabel.className = 'ship-name';
         nameLabel.textContent = ship.name;
 
+        // Assemble the card
+        card.appendChild(rarityLabel);
         card.appendChild(img);
         card.appendChild(nameLabel);
         grid.appendChild(card);
     });
 }
-
 // ==========================================
 // DOSSIER & HISTORICAL ROUTING
 // ==========================================
