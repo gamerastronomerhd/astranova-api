@@ -209,13 +209,17 @@ body {
     /* Notice we removed the hardcoded 'transform' from here! */
 }
 
-/* --- NEW: Dynamic Scale Classes --- */
+/* --- NEW: 3-Tier Dynamic Scale Classes --- */
 .scale-normal {
-    transform: scale(1.05); /* Just a tiny bump for Common/Rare/Elite */
+    transform: scale(1.05); /* Common, Rare, Elite */
+}
+
+.scale-large {
+    transform: scale(1.20); /* Super Rare, Priority */
 }
 
 .scale-massive {
-    transform: scale(1.35); /* The epic Gacha bleed for SSR/UR/PR/DR */
+    transform: scale(1.35); /* Ultra Rare, Decisive */
 }
 
 .dossier-intel {
@@ -536,11 +540,16 @@ body.historical-theme .ship-name {
 
 /* Dynamic Hover States */
 .scale-normal:hover {
-    transform: scale(1.25);
+    transform: scale(1.20);
+    cursor: zoom-in;
+}
+
+.scale-large:hover {
+    transform: scale(1.45);
     cursor: zoom-in;
 }
 
 .scale-massive:hover {
-    transform: scale(1.45);
+    transform: scale(1.55);
     cursor: zoom-in;
 }

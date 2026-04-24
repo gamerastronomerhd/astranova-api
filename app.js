@@ -195,20 +195,22 @@ function openDossier(ship) {
     // --- PROGRESSIVE LOADING ENGINE ---
     const artImg = document.getElementById('dossier-art');
 
-    // 1. DYNAMIC RARITY SCALING
-    // Strip away old classes from the previous ship clicked
-    artImg.classList.remove('scale-normal', 'scale-massive');
+	// 1. DYNAMIC 3-TIER RARITY SCALING
+    // Strip away ALL old classes from the previous ship clicked
+    artImg.classList.remove('scale-normal', 'scale-large', 'scale-massive');
     
-    // Check if the ship belongs to a high-rarity tier with massive artwork
-    const massiveRarities = ["Super Rare", "Ultra Rare", "Priority", "Decisive"];
-    if (massiveRarities.includes(ship.rarity)) {
-        artImg.classList.add('scale-massive');
+    // Define the specific tiers
+    const urRarities = ["Ultra Rare", "Decisive"];
+    const ssrRarities = ["Super Rare", "Priority"];
+    
+    // Apply the exact scale needed for their canvas size
+    if (urRarities.includes(ship.rarity)) {
+        artImg.classList.add('scale-massive'); // Extreme zoom for URs
+    } else if (ssrRarities.includes(ship.rarity)) {
+        artImg.classList.add('scale-large');   // Moderate zoom for SSRs
     } else {
-        artImg.classList.add('scale-normal');
+        artImg.classList.add('scale-normal');  // Gentle frame for standard ships
     }
-
-    // 2. Instant Feedback: Use the small icon, stretch it, and dim it
-    // ... (keep the rest of your existing image loading code here)
 	
     // 1. Instant Feedback: Use the small icon, stretch it, and dim it
     artImg.src = ship.icon_url; 
