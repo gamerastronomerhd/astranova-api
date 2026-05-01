@@ -175,8 +175,12 @@
             
             <span id="api-status"> 🟢  System Online</span>
             <button onclick="logout()" style="margin-left:20px; background:transparent; border:1px solid var(--danger); color:var(--danger); padding:5px 15px; border-radius:20px; cursor:pointer;">Logout</button>
+            
+            <!-- NEW: Hall of Records Button -->
+            <button id="open-roster-btn" style="background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 5px 15px; border-radius: 20px; cursor: pointer; margin-left: 10px; font-weight: bold;">
+                📜 Hall of Records
+            </button>
         </div>
-    </div>
 
     <div class="tab-container">
 <div class="tabs">
@@ -460,13 +464,66 @@
             });
         }
 
+// --- UPGRADED FLEET MANAGEMENT SYSTEM ---
+
+        // Helper function to cleanly sort hull types
+        function getFleetRole(hullType) {
+            if (!hullType) return 'vanguard'; // Fallback
+            const hull = hullType.toLowerCase();
+            
+            // Arrays containing both full names and abbreviations
+            const mainHulls = ['battleship', 'battlecruiser', 'aviation battleship', 'aircraft carrier', 'light aircraft carrier', 'repair ship', 'monitor', 'bb', 'bc', 'bbv', 'cv', 'cvl', 'ar', 'bm'];
+            const subHulls = ['submarine', 'submarine carrier', 'sailing frigate', 'ss', 'ssv', 'ix'];
+            
+            if (mainHulls.some(h => hull.includes(h))) return 'main';
+            if (subHulls.some(h => hull.includes(h))) return 'sub';
+            
+            // Destroyers, Light/Heavy/Large Cruisers, Munition Ships default to Vanguard
+            return 'vanguard'; 
+        }
+
         function toggleFleet(collectionId) {
             if (activeFleetIds.includes(collectionId)) {
+                // If ship is already in fleet, remove it
                 activeFleetIds = activeFleetIds.filter(id => id !== collectionId);
             } else {
-                if (activeFleetIds.length >= 6) { alert("Fleet is full! Maximum 6 ships."); return; }
+                // Get the ship we are trying to add
+                const item = currentDockData.find(s => s.id === collectionId);
+                if (!item) return;
+                
+                const role = getFleetRole(item.ship.hull_type);
+                
+                // Count current fleet composition
+                let mainCount = 0;
+                let vanCount = 0;
+                let subCount = 0;
+                
+                activeFleetIds.forEach(id => {
+                    const activeShip = currentDockData.find(s => s.id === id);
+                    if (activeShip) {
+                        const activeRole = getFleetRole(activeShip.ship.hull_type);
+                        if (activeRole === 'main') mainCount++;
+                        else if (activeRole === 'sub') subCount++;
+                        else vanCount++;
+                    }
+                });
+
+                // Enforce the 3-Ship strict limits per row
+                if (role === 'main' && mainCount >= 3) {
+                    alert("Main Fleet is full! (Maximum 3)");
+                    return;
+                } else if (role === 'vanguard' && vanCount >= 3) {
+                    alert("Vanguard Fleet is full! (Maximum 3)");
+                    return;
+                } else if (role === 'sub' && subCount >= 3) {
+                    alert("Submarine Fleet is full! (Maximum 3)");
+                    return;
+                }
+
+                // If it passes the checks, add to fleet
                 activeFleetIds.push(collectionId);
             }
+            
             localStorage.setItem('astra_active_fleet', JSON.stringify(activeFleetIds));
             renderFleet();
         }
@@ -483,11 +540,6 @@
             
             let hasSubs = false;
 
-            // Arrays to categorize hull types based on game mechanics
-            const mainHulls = ['BB', 'BC', 'BBV', 'CV', 'CVL', 'AR', 'BM'];
-            const vanHulls = ['DD', 'CL', 'CA', 'CB', 'AE', 'DDG'];
-            const subHulls = ['SS', 'SSV', 'IX'];
-
             if (activeFleetIds.length === 0) {
                 mainContainer.innerHTML = '<p style="color: var(--text-muted); margin: auto 0;">No Main Fleet assigned.</p>';
                 vanContainer.innerHTML = '<p style="color: var(--text-muted); margin: auto 0;">No Vanguard assigned.</p>';
@@ -499,12 +551,13 @@
                 const item = currentDockData.find(ship => ship.id === id);
                 if (!item) return;
 
-                const hull = item.ship.hull_type;
+                const hull = item.ship.hull_type || "Unknown";
+                const role = getFleetRole(hull);
                 const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/60x60/1e293b/00f2fe?text=?';
                 
                 const cardHtml = `
                     <div style="background: var(--bg-panel); padding: 8px; border-radius: 8px; text-align: center; border: 1px solid var(--accent-gold); width: 75px; position: relative;">
-                        <div style="position: absolute; top: -8px; left: -8px; background: var(--bg-void); border: 1px solid var(--accent-cyan); font-size: 9px; padding: 2px 4px; border-radius: 4px; font-weight: bold;">${hull}</div>
+                        <div style="position: absolute; top: -8px; left: -8px; background: var(--bg-void); border: 1px solid var(--accent-cyan); font-size: 9px; padding: 2px 4px; border-radius: 4px; font-weight: bold; white-space: nowrap;">${hull}</div>
                         <img src="${img}" style="width: 55px; height: 55px; border-radius: 6px; object-fit: cover; margin-bottom: 5px; border: 1px solid #334155;">
                         <div style="font-weight: bold; color: #fff; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.ship.name}</div>
                         <div style="font-size: 10px; color: var(--success); margin-bottom: 5px;">Lv. ${item.level}</div>
@@ -512,16 +565,13 @@
                     </div>
                 `;
 
-                // Route the ship to the correct row based on her Hull Type
-                if (mainHulls.includes(hull)) {
+                // Route the ship to the correct row based on her resolved Role
+                if (role === 'main') {
                     mainContainer.innerHTML += cardHtml;
-                } else if (vanHulls.includes(hull)) {
-                    vanContainer.innerHTML += cardHtml;
-                } else if (subHulls.includes(hull)) {
+                } else if (role === 'sub') {
                     subContainer.innerHTML += cardHtml;
                     hasSubs = true;
                 } else {
-                    // Fallback just in case
                     vanContainer.innerHTML += cardHtml;
                 }
             });
