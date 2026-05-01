@@ -102,6 +102,35 @@
             align-items: center;
             gap: 6px;
         }
+		
+		/* ==========================================
+           HALL OF RECORDS MODAL (DASHBOARD)
+        ========================================== */
+        .hidden { display: none !important; }
+        .modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-content { background: var(--bg-panel); border-radius: 12px; position: relative; color: white; }
+        .close-btn {
+            position: absolute; top: 15px; right: 20px; font-size: 24px;
+            background: transparent; color: var(--text-muted); border: none; cursor: pointer;
+        }
+        .close-btn:hover { color: white; }
+
+        .roster-content { max-width: 600px; padding: 30px; border-top: 4px solid #fbbf24; box-shadow: 0 -4px 25px rgba(251, 191, 36, 0.15); width: 100%; box-sizing: border-box; }
+        .roster-header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 20px; }
+        .roster-header h2 { color: #fbbf24; margin-bottom: 10px; letter-spacing: 1px; }
+        .roster-grid { display: flex; flex-direction: column; gap: 20px; }
+        .roster-tier { background: rgba(15, 23, 42, 0.5); border-radius: 8px; padding: 15px; border-left: 3px solid transparent; }
+        .tier-ur { border-left-color: #f43f5e; }
+        .tier-ur h3 { color: #f43f5e; margin-bottom: 10px; margin-top: 0; }
+        .tier-ssr { border-left-color: #fbbf24; }
+        .tier-ssr h3 { color: #fbbf24; margin-bottom: 10px; margin-top: 0; }
+        .supporter-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .supporter-list li { font-size: 0.9rem; color: #cbd5e1; }
+        .roster-footer { margin-top: 30px; text-align: center; }
     </style>
 
     </style>
@@ -716,6 +745,30 @@
             document.getElementById('res-coins').value = localStorage.getItem('astra_coins') || 0;
             document.getElementById('res-cubes').value = localStorage.getItem('astra_cubes') || 0;
         }
+
+// --- Hall of Records Logic ---
+        const rosterModal = document.getElementById('roster-modal');
+        const openRosterBtn = document.getElementById('open-roster-btn');
+        const closeRosterBtn = document.getElementById('close-roster');
+
+        if (openRosterBtn) {
+            openRosterBtn.addEventListener('click', () => { rosterModal.classList.remove('hidden'); });
+        }
+        if (closeRosterBtn) {
+            closeRosterBtn.addEventListener('click', () => { rosterModal.classList.add('hidden'); });
+        }
+        if (rosterModal) {
+            rosterModal.addEventListener('click', (e) => {
+                if (e.target === rosterModal) rosterModal.classList.add('hidden');
+            });
+        }
+
+        // ESC Key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && rosterModal && !rosterModal.classList.contains('hidden')) {
+                rosterModal.classList.add('hidden');
+            }
+        });
 
         function logout() { localStorage.removeItem('astra_token'); window.location.href = 'login.html'; }
 
