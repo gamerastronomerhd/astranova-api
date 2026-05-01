@@ -523,18 +523,27 @@ body.historical-theme .ship-name {
 }
 		
 .compliance-footer {
-            position: fixed;       /* Locks it to the screen */
-            bottom: 0;             /* Locks it to the very bottom */
+            position: fixed;
+            bottom: 0;
             left: 0;
             width: 100%;
             text-align: center;
             font-size: 11px;
             color: var(--text-muted);
-            background-color: #0b0f19; /* Solid background so ships don't bleed through */
-            padding: 15px 0 20px 0;    /* Reduced padding to save screen space */
-            border-top: 1px solid var(--border-color); 
-            z-index: 100;          /* Keeps it hovering above the ship cards */
-            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.6); /* Adds a sleek floating shadow */
+            
+            /* The Glassmorphism Magic */
+            background-color: rgba(11, 15, 25, 0.75); /* Semi-transparent void color */
+            backdrop-filter: blur(10px); /* Blurs the ships sliding underneath */
+            -webkit-backdrop-filter: blur(10px); /* For Safari browsers */
+            
+            padding: 10px 0 15px 0; /* Slimmed down padding */
+            border-top: 1px solid rgba(30, 41, 59, 0.6); /* Softer top border */
+            z-index: 100;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3); /* Much softer shadow */
+        }
+		
+.compliance-footer p {
+            margin: 3px 0; /* Pulls the text lines closer together */
         }
 
 .compliance-footer a {
@@ -552,7 +561,7 @@ body.historical-theme .ship-name {
     font-size: 12px;
     cursor: pointer;
     text-transform: uppercase;
-    margin-top: 15px;
+    margin-top: 8px; /* Tighter spacing */
     transition: all 0.2s;
 }
 
@@ -572,7 +581,7 @@ body.historical-theme .ship-name {
             text-transform: uppercase;
             font-weight: bold;
             text-decoration: none;
-            margin-top: 15px;
+            margin-top: 8px; /* Tighter spacing */
             margin-left: 10px;
             transition: all 0.2s ease;
         }
