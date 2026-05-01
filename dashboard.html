@@ -104,6 +104,30 @@
         }
 		
 		/* ==========================================
+           AFFILIATE BUTTON
+        ========================================== */
+        .affiliate-btn {
+            display: inline-block;
+            background: transparent;
+            border: 1px solid #c38dff; 
+            color: #c38dff !important;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .affiliate-btn:hover {
+            background: rgba(195, 141, 255, 0.1);
+            box-shadow: 0 0 10px rgba(195, 141, 255, 0.3);
+        }
+		
+		/* ==========================================
            HALL OF RECORDS MODAL (DASHBOARD)
         ========================================== */
         .hidden { display: none !important; }
@@ -839,6 +863,44 @@
         <a href="https://animota.net/collections/azur-lane?_pos=1&_psq=azur&_ss=e&_v=1.0&aff=144" target="_blank" class="affiliate-btn">
             📦 Expand Your Fleet (Shop Merch)
         </a>
+    </div>
+	
+	<!-- HALL OF RECORDS MODAL -->
+    <div id="roster-modal" class="modal-backdrop hidden">
+        <div class="modal-content roster-content">
+            <button id="close-roster" class="close-btn">&times;</button>
+            <div class="roster-header">
+                <h2>🎖️ The Hall of Records</h2>
+                <p>Recognizing the Commanders whose strategic funding keeps the Grand Archive operational.</p>
+            </div>
+            
+            <div class="roster-grid">
+                <!-- Top Tier Supporters -->
+                <div class="roster-tier tier-ur">
+                    <h3>Fleet Admirals</h3>
+                    <ul class="supporter-list">
+                        <li>Commander Shepard</li>
+                        <li>Akashi_Fan_99</li>
+                    </ul>
+                </div>
+                
+                <!-- Mid Tier Supporters -->
+                <div class="roster-tier tier-ssr">
+                    <h3>Captains</h3>
+                    <ul class="supporter-list">
+                        <li>AzurGamer</li>
+                        <li>IronBlood_Main</li>
+                        <li>EagleUnion_Strategist</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="roster-footer">
+                <button class="donate-btn" onclick="window.open('https://streamlabs.com/gamerastronomer/tip', '_blank')">
+                    Join the Command Staff
+                </button>
+            </div>
+        </div>
     </div>
 </body>
 </html>
