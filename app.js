@@ -212,7 +212,40 @@ function toggleDossierView(e) {
 }
 
 function openDossier(ship) {
-    const isGlobalArchive = document.body.classList.contains('historical-theme');
+    // 1. Target the main inner box of your dossier modal
+    const dossierContent = document.querySelector('.dossier-content'); 
+    
+    // 2. Strip away any old rarity classes from the last ship you looked at
+    dossierContent.className = 'dossier-content'; 
+    
+    // 3. Apply the new CSS class using the helper function we built earlier
+    const rarityClass = getRarityClass(ship.rarity);
+    dossierContent.classList.add(`dossier-${rarityClass}`);
+
+    // 4. Translate the database rarity text into short UI text
+    let displayRarity = ship.rarity || 'Unknown';
+    if (displayRarity === "Super Rare") displayRarity = "SSR";
+    if (displayRarity === "Ultra Rare") displayRarity = "UR";
+    if (displayRarity === "Priority") displayRarity = "PR";
+    if (displayRarity === "Decisive") displayRarity = "DR";
+    if (displayRarity === "Normal") displayRarity = "N";
+    if (displayRarity === "Rare") displayRarity = "R";
+    if (displayRarity === "Elite") displayRarity = "E";
+
+    // 5. Build or Update the Badge
+    let badge = document.getElementById('dossier-rarity-badge');
+    if (!badge) {
+        // If it doesn't exist yet, create it and attach it to the dossier
+        badge = document.createElement('div');
+        badge.id = 'dossier-rarity-badge';
+        badge.className = 'dossier-rarity-badge';
+        dossierContent.appendChild(badge);
+    }
+    badge.textContent = displayRarity;
+
+    // ... [Your existing code that loads the ship's name, stats, and the skin arrows goes here] ...
+	
+	const isGlobalArchive = document.body.classList.contains('historical-theme');
     historyToggle.checked = isGlobalArchive; 
     toggleDossierView(); 
 

@@ -662,3 +662,53 @@ body.historical-theme .ship-name {
     border: 1px solid #f43f5e;
 }
 .rarity-ur:hover { border-color: #f43f5e; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4); }
+
+/* ==========================================
+   DOSSIER RARITY STYLING
+========================================== */
+/* The main dossier window needs relative positioning for the badge */
+.dossier-content {
+    position: relative;
+    border-top: 4px solid transparent;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* The larger badge inside the dossier */
+.dossier-rarity-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 20;
+}
+
+/* Normal / Common */
+.dossier-common { border-top-color: #94a3b8; }
+.dossier-common .dossier-rarity-badge { color: #94a3b8; border: 1px solid #94a3b8; }
+
+/* Rare */
+.dossier-rare { border-top-color: #3b82f6; box-shadow: 0 -4px 20px rgba(59, 130, 246, 0.1); }
+.dossier-rare .dossier-rarity-badge { color: #3b82f6; border: 1px solid #3b82f6; }
+
+/* Elite */
+.dossier-elite { border-top-color: #a855f7; box-shadow: 0 -4px 20px rgba(168, 85, 247, 0.15); }
+.dossier-elite .dossier-rarity-badge { color: #a855f7; border: 1px solid #a855f7; }
+
+/* Super Rare / Priority (SSR/PR) */
+.dossier-ssr { border-top-color: #fbbf24; box-shadow: 0 -4px 25px rgba(251, 191, 36, 0.2); }
+.dossier-ssr .dossier-rarity-badge { color: #fbbf24; border: 1px solid #fbbf24; }
+
+/* Ultra Rare / Decisive (UR/DR) */
+.dossier-ur { border-top-color: #f43f5e; box-shadow: 0 -4px 30px rgba(244, 63, 94, 0.25); }
+.dossier-ur .dossier-rarity-badge {
+    background: linear-gradient(90deg, #f43f5e, #fbbf24, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    border: 1px solid #f43f5e;
+}
