@@ -216,7 +216,7 @@ function openDossier(ship) {
     const dossierContent = document.querySelector('.dossier-content'); 
     
     // 2. Strip away any old rarity classes from the last ship you looked at
-    dossierContent.className = 'dossier-content'; 
+    dossierContent.className = 'modal-content dossier-content';
     
     // 3. Apply the new CSS class using the helper function we built earlier
     const rarityClass = getRarityClass(ship.rarity);
