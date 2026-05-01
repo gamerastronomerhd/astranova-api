@@ -87,14 +87,39 @@ function setupEventListeners() {
         document.body.classList.toggle('historical-theme', e.target.checked);
     });
 
-	// 4. NEW: Close via ESC Key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
-            modal.classList.add('hidden');
-            document.getElementById('dossier-art').src = ''; // 🚨 ABORT SWITCH: KILLS PENDING DOWNLOADS
+// --- Hall of Records Logic ---
+    const rosterModal = document.getElementById('roster-modal');
+    const openRosterBtn = document.getElementById('open-roster-btn');
+    const closeRosterBtn = document.getElementById('close-roster');
+
+    openRosterBtn?.addEventListener('click', () => {
+        rosterModal.classList.remove('hidden');
+    });
+
+    closeRosterBtn?.addEventListener('click', () => {
+        rosterModal.classList.add('hidden');
+    });
+
+    rosterModal?.addEventListener('click', (e) => {
+        if (e.target === rosterModal) {
+            rosterModal.classList.add('hidden');
         }
     });
 
+    // Add Roster to the ESC key logic
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            // Close Dossier if open
+            if (modal && !modal.classList.contains('hidden')) {
+                modal.classList.add('hidden');
+                document.getElementById('dossier-art').src = '';
+            }
+            // Close Roster if open
+            if (rosterModal && !rosterModal.classList.contains('hidden')) {
+                rosterModal.classList.add('hidden');
+            }
+        }
+    });
     console.log("✅ Listeners attached successfully!"); 
 }
 

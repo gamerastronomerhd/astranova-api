@@ -554,6 +554,29 @@ body.historical-theme .ship-name {
 .compliance-footer .donate-btn:hover {
     background: rgba(34, 211, 238, 0.1); /* Using the cyan hex with opacity */
 }
+
+.affiliate-btn {
+            display: inline-block;
+            background: transparent;
+            border: 1px solid #c38dff; /* Elite Purple */
+            color: #c38dff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 15px;
+            margin-left: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .affiliate-btn:hover {
+            background: rgba(195, 141, 255, 0.1);
+            box-shadow: 0 0 10px rgba(195, 141, 255, 0.3);
+        }
+
 /* ==========================================
    WARDROBE CONTROLS
 ========================================== */
@@ -711,4 +734,86 @@ body.historical-theme .ship-name {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     border: 1px solid #f43f5e;
+}
+/* ==========================================
+   AFFILIATE BUTTON
+========================================== */
+.affiliate-btn {
+    display: inline-block;
+    background: transparent;
+    border: 1px solid #a855f7; /* Elite Purple */
+    color: #a855f7;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    margin-left: 10px;
+    transition: all 0.2s ease;
+}
+
+.affiliate-btn:hover {
+    background: rgba(168, 85, 247, 0.1);
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+}
+
+/* ==========================================
+   HALL OF RECORDS MODAL
+========================================== */
+.roster-content {
+    max-width: 600px;
+    padding: 30px;
+    border-top: 4px solid #fbbf24; /* SSR Gold Border */
+    box-shadow: 0 -4px 25px rgba(251, 191, 36, 0.15);
+}
+
+.roster-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 20px;
+}
+
+.roster-header h2 {
+    color: #fbbf24;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.roster-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.roster-tier {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 3px solid transparent;
+}
+
+.tier-ur { border-left-color: #f43f5e; }
+.tier-ur h3 { color: #f43f5e; margin-bottom: 10px; }
+
+.tier-ssr { border-left-color: #fbbf24; }
+.tier-ssr h3 { color: #fbbf24; margin-bottom: 10px; }
+
+.supporter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.supporter-list li {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+}
+
+.roster-footer {
+    margin-top: 30px;
+    text-align: center;
 }
