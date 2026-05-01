@@ -87,6 +87,14 @@ function setupEventListeners() {
         document.body.classList.toggle('historical-theme', e.target.checked);
     });
 
+	// 4. NEW: Close via ESC Key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+            modal.classList.add('hidden');
+            document.getElementById('dossier-art').src = ''; // 🚨 ABORT SWITCH: KILLS PENDING DOWNLOADS
+        }
+    });
+
     console.log("✅ Listeners attached successfully!"); 
 }
 
