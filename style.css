@@ -17,6 +17,7 @@ body {
     background-color: var(--bg-dark);
     color: var(--text-main);
     min-height: 100vh;
+	padding-bottom: 140px; /* Ensures the last row of ships can be scrolled into view */
 }
 
 /* Header Styling */
@@ -522,15 +523,19 @@ body.historical-theme .ship-name {
 }
 		
 .compliance-footer {
-    text-align: center;
-    font-size: 11px;
-    color: var(--text-muted);
-    width: 100%;
-    padding: 40px 0 20px 0; 
-    margin-top: 50px; 
-    border-top: 1px solid rgba(255, 255, 255, 0.05); 
-    clear: both; 
-}
+            position: fixed;       /* Locks it to the screen */
+            bottom: 0;             /* Locks it to the very bottom */
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            background-color: #0b0f19; /* Solid background so ships don't bleed through */
+            padding: 15px 0 20px 0;    /* Reduced padding to save screen space */
+            border-top: 1px solid var(--border-color); 
+            z-index: 100;          /* Keeps it hovering above the ship cards */
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.6); /* Adds a sleek floating shadow */
+        }
 
 .compliance-footer a {
     color: var(--accent-cyan);

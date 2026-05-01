@@ -9,7 +9,7 @@
             --accent-cyan: #00f2fe; --accent-gold: #fbbf24; --text-main: #e2e8f0;
             --text-muted: #94a3b8; --danger: #ef4444; --success: #22c55e;
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-void); color: var(--text-main); margin: 0; }
+		body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-void); color: var(--text-main); margin: 0; padding-bottom: 140px; }
         
         .topbar { background: var(--bg-panel); border-bottom: 1px solid var(--border-color); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .res-bar { display: flex; gap: 20px; background: #0f172a; padding: 5px 20px; border-radius: 20px; border: 1px solid #334155; }
@@ -56,15 +56,20 @@
         .stat-highlight { color: var(--accent-cyan); font-weight: bold; }
 		
 .compliance-footer {
-    text-align: center;
-    font-size: 11px;
-    color: var(--text-muted);
-    width: 100%;
-    padding: 40px 0 20px 0; 
-    margin-top: 50px; 
-    border-top: 1px solid rgba(255, 255, 255, 0.05); 
-    clear: both; 
-}
+            position: fixed;       /* Locks it to the screen */
+            bottom: 0;             /* Locks it to the very bottom */
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            background-color: #0b0f19; /* Solid background so ships don't bleed through */
+            padding: 15px 0 20px 0;    /* Reduced padding to save screen space */
+            border-top: 1px solid var(--border-color); 
+            z-index: 100;          /* Keeps it hovering above the ship cards */
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.6); /* Adds a sleek floating shadow */
+        }
+		
         .compliance-footer a {
             color: var(--accent-cyan);
             text-decoration: none;
