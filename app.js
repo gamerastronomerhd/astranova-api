@@ -37,8 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchFleetData() {
     try {
         // ADDED 'rarity' TO THE SELECT QUERY RIGHT AFTER 'name'
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/ships?select=id,name,rarity,icon_url,painting_url,faction,hull_type,ship_base_stats(*),ship_skins(name,painting_url)&icon_url=not.is.null`, {
-            method: 'GET',
+const response = await fetch(`${SUPABASE_URL}/rest/v1/ships?select=id,name,rarity,icon_url,painting_url,faction,hull_type,ship_base_stats(*),ship_skins(name,painting_url),ship_skills(*)&icon_url=not.is.null`, {            method: 'GET',
             headers: HEADERS
         });
 
@@ -237,16 +236,16 @@ function updateStatGrid(level) {
     const s = currentShipStats;
     let hp, fp, aa, avi, trp, rld;
     
-    // Map the database columns to the UI based on the selected level
     if (level === 'base') {
         hp = s.health; fp = s.firepower; aa = s.anti_air; avi = s.aviation; trp = s.torpedo; rld = s.reload;
+    } else if (level === '100') {
+        hp = s.hp_100; fp = s.fp_100; aa = s.aa_100; avi = s.avi_100; trp = s.trp_100; rld = s.reload_100;
     } else if (level === '120') {
         hp = s.hp_120; fp = s.fp_120; aa = s.aa_120; avi = s.avi_120; trp = s.trp_120; rld = s.reload_120;
     } else if (level === '125') {
         hp = s.hp_125; fp = s.fp_125; aa = s.aa_125; avi = s.avi_125; trp = s.trp_125; rld = s.reload_125;
     }
     
-    // Update the HTML. Fallback to '---' if the database is missing that specific stat
     document.getElementById('dos-hp').textContent = hp || '---';
     document.getElementById('dos-fp').textContent = fp || '---';
     document.getElementById('dos-aa').textContent = aa || '---';
@@ -312,20 +311,17 @@ function openDossier(ship) {
     document.getElementById('dossier-faction').textContent = ship.faction || 'Unknown';
     document.getElementById('dossier-type').textContent = ship.hull_type || 'Unknown';
     
-// --- POPULATE STATS ---
+// --- POPULATE STATS & TABS ---
     currentShipStats = (ship.ship_base_stats && ship.ship_base_stats.length > 0) ? ship.ship_base_stats[0] : {}; 
     
-    // Reset visual tabs to Level 120 default when opening a new dossier
     const tabs = document.querySelectorAll('.stat-tab');
     if (tabs.length > 0) {
         tabs.forEach(t => t.classList.remove('active'));
         const defaultTab = document.querySelector('.stat-tab[data-level="120"]');
         if (defaultTab) defaultTab.classList.add('active');
         
-        // Fill grid with Level 120 stats immediately
         updateStatGrid('120');
 
-        // Attach click listeners to the UI tabs
         tabs.forEach(tab => {
             tab.onclick = (e) => {
                 tabs.forEach(t => t.classList.remove('active'));
@@ -333,6 +329,31 @@ function openDossier(ship) {
                 updateStatGrid(e.target.getAttribute('data-level'));
             };
         });
+    }
+
+    // --- POPULATE SKILLS ---
+    const skillsContainer = document.getElementById('dossier-skills-container');
+    skillsContainer.innerHTML = ''; // Clear old data
+
+    if (ship.ship_skills && ship.ship_skills.length > 0) {
+        ship.ship_skills.forEach(skill => {
+            const skillDiv = document.createElement('div');
+            skillDiv.className = 'skill-item';
+            
+            // Default to a placeholder if the icon is missing
+            const iconUrl = skill.icon_url || 'https://placehold.co/48x48/1e293b/00f2fe?text=?';
+
+            skillDiv.innerHTML = `
+                <img class="skill-icon" src="${iconUrl}" alt="${skill.name}">
+                <div class="skill-info">
+                    <div class="skill-name">${skill.name}</div>
+                    <div class="skill-desc">${skill.description}</div>
+                </div>
+            `;
+            skillsContainer.appendChild(skillDiv);
+        });
+    } else {
+        skillsContainer.innerHTML = '<p class="awaiting-data">No tactical skills detected in the Archive.</p>';
     }
 	
     const prefix = getHistoricalPrefix(ship.faction);

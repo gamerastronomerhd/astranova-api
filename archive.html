@@ -102,23 +102,35 @@
                             <span id="dossier-faction" class="tag faction-tag">Faction</span>
                             <span id="dossier-type" class="tag type-tag">Hull Type</span>
                         </div>
-						<div class="dossier-stats-container">
-                            <h3>Level 120 Operational Intel</h3>
-                            <div class="dossier-stat-grid">
-                                <div class="stat-box"><span class="stat-icon">❤️</span> <span class="stat-name">HP</span> <span id="dos-hp" class="stat-val">---</span></div>
-                                <div class="stat-box"><span class="stat-icon">⚔️</span> <span class="stat-name">FP</span> <span id="dos-fp" class="stat-val">---</span></div>
-                                <div class="stat-box"><span class="stat-icon">🛡️</span> <span class="stat-name">AA</span> <span id="dos-aa" class="stat-val">---</span></div>
-                                <div class="stat-box"><span class="stat-icon">✈️</span> <span class="stat-name">AVI</span> <span id="dos-avi" class="stat-val">---</span></div>
-                                <div class="stat-box"><span class="stat-icon">🐟</span> <span class="stat-name">TRP</span> <span id="dos-trp" class="stat-val">---</span></div>
-                                <div class="stat-box"><span class="stat-icon">⏱️</span> <span class="stat-name">RLD</span> <span id="dos-rld" class="stat-val">---</span></div>
-                            </div>
-                            
-                            <!-- Placeholder for when the scraper finishes -->
-                            <div id="dossier-skills" class="dossier-skills-container">
-                                <h3>Tactical Skills</h3>
-                                <p style="font-size: 11px; color: var(--text-muted); font-style: italic;">Awaiting data extraction protocol...</p>
+				<div class="dossier-stats">
+                        <!-- THE NEW 4-TAB HEADER -->
+                        <div class="stats-header-row">
+                            <h3>Operational Intel</h3>
+                            <div class="stat-tabs">
+                                <button class="stat-tab" data-level="base">LV 1</button>
+                                <button class="stat-tab" data-level="100">LV 100</button>
+                                <button class="stat-tab active" data-level="120">LV 120</button>
+                                <button class="stat-tab" data-level="125">LV 125</button>
                             </div>
                         </div>
+                        
+                        <div class="stat-grid">
+                            <div class="stat-box"><span class="stat-icon">❤️</span> <span class="stat-label">HP</span> <span class="stat-value" id="dos-hp">---</span></div>
+                            <div class="stat-box"><span class="stat-icon">⚔️</span> <span class="stat-label">FP</span> <span class="stat-value" id="dos-fp">---</span></div>
+                            <div class="stat-box"><span class="stat-icon">🛡️</span> <span class="stat-label">AA</span> <span class="stat-value" id="dos-aa">---</span></div>
+                            <div class="stat-box"><span class="stat-icon">✈️</span> <span class="stat-label">AVI</span> <span class="stat-value" id="dos-avi">---</span></div>
+                            <div class="stat-box"><span class="stat-icon">🐟</span> <span class="stat-label">TRP</span> <span class="stat-value" id="dos-trp">---</span></div>
+                            <div class="stat-box"><span class="stat-icon">⏱️</span> <span class="stat-label">RLD</span> <span class="stat-value" id="dos-rld">---</span></div>
+                        </div>
+                    </div>
+
+                    <div class="dossier-skills">
+                        <h3>Tactical Skills</h3>
+                        <!-- THE NEW SKILLS CONTAINER -->
+                        <div id="dossier-skills-container" class="skills-container">
+                            <p class="awaiting-data">Awaiting data extraction protocol...</p>
+                        </div>
+                    </div>
                     </div>
                 </div>
 
