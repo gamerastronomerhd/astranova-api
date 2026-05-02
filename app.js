@@ -14,6 +14,8 @@ let masterFleet = [];
 let currentSkins = [];
 let currentSkinIndex = 0;
 let currentShipName = "";
+let currentShipStats = {};
+
 
 // UI Elements
 const modal = document.getElementById('dossier-modal');
@@ -230,6 +232,30 @@ function getHistoricalPrefix(faction) {
     return ''; 
 }
 
+// --- NEW ---
+function updateStatGrid(level) {
+    const s = currentShipStats;
+    let hp, fp, aa, avi, trp, rld;
+    
+    // Map the database columns to the UI based on the selected level
+    if (level === 'base') {
+        hp = s.health; fp = s.firepower; aa = s.anti_air; avi = s.aviation; trp = s.torpedo; rld = s.reload;
+    } else if (level === '120') {
+        hp = s.hp_120; fp = s.fp_120; aa = s.aa_120; avi = s.avi_120; trp = s.trp_120; rld = s.reload_120;
+    } else if (level === '125') {
+        hp = s.hp_125; fp = s.fp_125; aa = s.aa_125; avi = s.avi_125; trp = s.trp_125; rld = s.reload_125;
+    }
+    
+    // Update the HTML. Fallback to '---' if the database is missing that specific stat
+    document.getElementById('dos-hp').textContent = hp || '---';
+    document.getElementById('dos-fp').textContent = fp || '---';
+    document.getElementById('dos-aa').textContent = aa || '---';
+    document.getElementById('dos-avi').textContent = avi || '---';
+    document.getElementById('dos-trp').textContent = trp || '---';
+    document.getElementById('dos-rld').textContent = rld || '---';
+}
+// ----------------------------------------------
+
 function toggleDossierView(e) {
     const isChecked = e ? e.target.checked : historyToggle.checked;
     
@@ -286,16 +312,28 @@ function openDossier(ship) {
     document.getElementById('dossier-faction').textContent = ship.faction || 'Unknown';
     document.getElementById('dossier-type').textContent = ship.hull_type || 'Unknown';
     
-	// --- POPULATE STATS ---
-    // If stats don't exist for a ship, default to an empty object to prevent crashes
-    const s = (ship.ship_base_stats && ship.ship_base_stats.length > 0) ? ship.ship_base_stats[0] : {}; 
+// --- POPULATE STATS ---
+    currentShipStats = (ship.ship_base_stats && ship.ship_base_stats.length > 0) ? ship.ship_base_stats[0] : {}; 
+    
+    // Reset visual tabs to Level 120 default when opening a new dossier
+    const tabs = document.querySelectorAll('.stat-tab');
+    if (tabs.length > 0) {
+        tabs.forEach(t => t.classList.remove('active'));
+        const defaultTab = document.querySelector('.stat-tab[data-level="120"]');
+        if (defaultTab) defaultTab.classList.add('active');
+        
+        // Fill grid with Level 120 stats immediately
+        updateStatGrid('120');
 
-    document.getElementById('dos-hp').textContent = s.health_120 || s.health || '---';
-    document.getElementById('dos-fp').textContent = s.firepower_120 || s.firepower || '---';
-    document.getElementById('dos-aa').textContent = s.anti_air_120 || s.anti_air || '---';
-    document.getElementById('dos-avi').textContent = s.aviation_120 || s.aviation || '---';
-    document.getElementById('dos-trp').textContent = s.torpedo_120 || s.torpedo || '---';
-    document.getElementById('dos-rld').textContent = s.reload_120 || s.reload || '---';
+        // Attach click listeners to the UI tabs
+        tabs.forEach(tab => {
+            tab.onclick = (e) => {
+                tabs.forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                updateStatGrid(e.target.getAttribute('data-level'));
+            };
+        });
+    }
 	
     const prefix = getHistoricalPrefix(ship.faction);
     document.getElementById('history-name').textContent = `${prefix}${ship.name}`;
