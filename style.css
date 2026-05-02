@@ -831,3 +831,48 @@ body.historical-theme .ship-name {
     margin-top: 30px;
     text-align: center;
 }
+
+/* ==========================================
+   DOSSIER STAT GRID
+========================================== */
+.dossier-stats-container { margin-top: 20px; }
+.dossier-stats-container h3 { 
+    color: var(--accent-cyan); 
+    font-size: 14px; 
+    margin-bottom: 10px; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+    padding-bottom: 5px; 
+    text-transform: uppercase;
+}
+
+.dossier-stat-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 10px; 
+    margin-bottom: 20px; 
+}
+
+.stat-box { 
+    background: rgba(15, 23, 42, 0.6); 
+    border: 1px solid #334155; 
+    border-radius: 6px; 
+    padding: 8px 10px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+}
+
+.stat-name { 
+    color: var(--text-muted); 
+    font-weight: bold; 
+    font-size: 11px;
+    flex-grow: 1; 
+    margin-left: 6px; 
+}
+
+.stat-val { 
+    color: #fff; 
+    font-weight: bold; 
+    font-family: monospace; 
+    font-size: 14px; 
+}

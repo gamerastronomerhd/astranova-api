@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchFleetData() {
     try {
         // ADDED 'rarity' TO THE SELECT QUERY RIGHT AFTER 'name'
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/ships?select=id,name,rarity,icon_url,painting_url,faction,hull_type,ship_skins(name,painting_url)&icon_url=not.is.null`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/ships?select=id,name,rarity,icon_url,painting_url,faction,hull_type,stats(*),ship_skins(name,painting_url)&icon_url=not.is.null`, {
             method: 'GET',
             headers: HEADERS
         });
@@ -286,6 +286,17 @@ function openDossier(ship) {
     document.getElementById('dossier-faction').textContent = ship.faction || 'Unknown';
     document.getElementById('dossier-type').textContent = ship.hull_type || 'Unknown';
     
+	// --- POPULATE STATS ---
+    // If stats don't exist for a ship, default to an empty object to prevent crashes
+    const s = (ship.stats && ship.stats.length > 0) ? ship.stats[0] : {}; 
+
+    document.getElementById('dos-hp').textContent = s.hp_120 || s.health || '---';
+    document.getElementById('dos-fp').textContent = s.fp_120 || s.firepower || '---';
+    document.getElementById('dos-aa').textContent = s.aa_120 || s.anti_air || '---';
+    document.getElementById('dos-avi').textContent = s.avi_120 || s.aviation || '---';
+    document.getElementById('dos-trp').textContent = s.trp_120 || s.torpedo || '---';
+    document.getElementById('dos-rld').textContent = s.reload_120 || s.reload || '---';
+	
     const prefix = getHistoricalPrefix(ship.faction);
     document.getElementById('history-name').textContent = `${prefix}${ship.name}`;
 	window.currentShipIcon = ship.icon_url;

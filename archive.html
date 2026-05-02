@@ -102,9 +102,22 @@
                             <span id="dossier-faction" class="tag faction-tag">Faction</span>
                             <span id="dossier-type" class="tag type-tag">Hull Type</span>
                         </div>
-                        <div class="dossier-stats">
-                            <h3>Operational Intel</h3>
-                            <p>Detailed fleet integration stats and tactical history will be routed here once the database is expanded.</p>
+						<div class="dossier-stats-container">
+                            <h3>Level 120 Operational Intel</h3>
+                            <div class="dossier-stat-grid">
+                                <div class="stat-box"><span class="stat-icon">❤️</span> <span class="stat-name">HP</span> <span id="dos-hp" class="stat-val">---</span></div>
+                                <div class="stat-box"><span class="stat-icon">⚔️</span> <span class="stat-name">FP</span> <span id="dos-fp" class="stat-val">---</span></div>
+                                <div class="stat-box"><span class="stat-icon">🛡️</span> <span class="stat-name">AA</span> <span id="dos-aa" class="stat-val">---</span></div>
+                                <div class="stat-box"><span class="stat-icon">✈️</span> <span class="stat-name">AVI</span> <span id="dos-avi" class="stat-val">---</span></div>
+                                <div class="stat-box"><span class="stat-icon">🐟</span> <span class="stat-name">TRP</span> <span id="dos-trp" class="stat-val">---</span></div>
+                                <div class="stat-box"><span class="stat-icon">⏱️</span> <span class="stat-name">RLD</span> <span id="dos-rld" class="stat-val">---</span></div>
+                            </div>
+                            
+                            <!-- Placeholder for when the scraper finishes -->
+                            <div id="dossier-skills" class="dossier-skills-container">
+                                <h3>Tactical Skills</h3>
+                                <p style="font-size: 11px; color: var(--text-muted); font-style: italic;">Awaiting data extraction protocol...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
