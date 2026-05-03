@@ -391,11 +391,13 @@ function openDossier(ship) {
     currentSkins = [baseSkin];
 
     // Append extra skins, forcing "Retrofit" to be Slot 1
+// Append extra skins, forcing "Kai" (Retrofit) to be Slot 1
     if (ship.ship_skins && ship.ship_skins.length > 0) {
-        // Find the retrofit skin if it exists
-        const retrofitSkin = ship.ship_skins.find(s => s.name.toLowerCase() === 'retrofit');
-        // Filter out all other skins
-        const otherSkins = ship.ship_skins.filter(s => s.name.toLowerCase() !== 'retrofit');
+        // Look for the native 'Kai' designation (or 'Retrofit' as a fallback)
+        const retrofitSkin = ship.ship_skins.find(s => s.name.toLowerCase() === 'kai' || s.name.toLowerCase() === 'retrofit');
+        
+        // Filter out the retrofit skin from the general wardrobe pool
+        const otherSkins = ship.ship_skins.filter(s => s.name.toLowerCase() !== 'kai' && s.name.toLowerCase() !== 'retrofit');
 
         // If she has a retrofit, push it immediately after Default
         if (retrofitSkin) {
