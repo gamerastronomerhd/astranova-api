@@ -383,17 +383,27 @@ function openDossier(ship) {
         artImg.classList.add('scale-normal');  
     }
 
-    // 2. COMPILE THE WARDROBE
+// 2. COMPILE THE WARDROBE
     const fallbackArtUrl = `https://azurlane.mrlar.dev/images/ships/${ship.name.toLowerCase().replace(/ /g, '_')}.png`;
     
     // The base default skin is always Slot 0
-    currentSkins = [
-        { name: "Default", painting_url: ship.painting_url || fallbackArtUrl, is_base: true }
-    ];
+    let baseSkin = { name: "Default", painting_url: ship.painting_url || fallbackArtUrl, is_base: true };
+    currentSkins = [baseSkin];
 
-    // Append any extra skins from the database
+    // Append extra skins, forcing "Retrofit" to be Slot 1
     if (ship.ship_skins && ship.ship_skins.length > 0) {
-        currentSkins = currentSkins.concat(ship.ship_skins);
+        // Find the retrofit skin if it exists
+        const retrofitSkin = ship.ship_skins.find(s => s.name.toLowerCase() === 'retrofit');
+        // Filter out all other skins
+        const otherSkins = ship.ship_skins.filter(s => s.name.toLowerCase() !== 'retrofit');
+
+        // If she has a retrofit, push it immediately after Default
+        if (retrofitSkin) {
+            currentSkins.push(retrofitSkin);
+        }
+        
+        // Add the rest of the skins (swimsuits, party dresses, etc.)
+        currentSkins = currentSkins.concat(otherSkins);
     }
 
     currentSkinIndex = 0;
