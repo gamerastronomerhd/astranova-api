@@ -892,9 +892,16 @@ body.historical-theme .ship-name {
 
 /* Tactical Skills */
 .skills-container {
-    display: flex; flex-direction: column; gap: 8px; margin-top: 10px;
-    max-height: 220px; overflow-y: auto; padding-right: 5px;
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+    margin-top: 10px;
+    max-height: 240px; /* Slightly increased for better visibility */
+    overflow-y: auto; 
+    padding-right: 5px;
+    padding-bottom: 15px; /* THE FIX: Adds breathing room to the bottom of the scroll area */
 }
+
 /* Custom Scrollbar for skills */
 .skills-container::-webkit-scrollbar { width: 4px; }
 .skills-container::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 4px; }
@@ -903,6 +910,12 @@ body.historical-theme .ship-name {
     display: flex; gap: 12px; background: rgba(0, 0, 0, 0.3); padding: 10px;
     border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05); align-items: flex-start;
 }
+
+/* THE FIX: Forces the UI to allow the last item to scroll completely above the cut-off */
+.skill-item:last-child {
+    margin-bottom: 10px; 
+}
+
 .skill-icon {
     width: 48px; height: 48px; border-radius: 6px; flex-shrink: 0;
     border: 1px solid #334155;
