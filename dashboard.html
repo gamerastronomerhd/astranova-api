@@ -2,22 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AstraNova Alpha Command</title>
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-5RLW58TCWP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstraNova | Command Center</title>
 
-  gtag('config', 'G-5RLW58TCWP');
-</script>
+    <meta property="og:title" content="AstraNova | Fleet Data Protocol">
+    <meta property="og:description" content="Secure Command Terminal for Global Fleet Technology Synchronization.">
+    <meta property="og:image" content="https://gamerastronomerhd.github.io/astranova-api/assets/Open Graph 1200x630.svg">
+    <meta property="og:url" content="https://gamerastronomerhd.github.io/astranova-api/">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" type="image/svg+xml" href="assets/Favicon 256x256.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/Browser Favicon 512x512.png">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X9HMP2TSHZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-X9HMP2TSHZ');
+    </script>
+
     <style>
         :root {
             --bg-void: #0b0f19; --bg-panel: #151e2e; --border-color: #1e293b;
             --accent-cyan: #00f2fe; --accent-gold: #fbbf24; --text-main: #e2e8f0;
             --text-muted: #94a3b8; --danger: #ef4444; --success: #22c55e;
+            --elite-purple: #c38dff;
         }
-		body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-void); color: var(--text-main); margin: 0; padding-bottom: 140px; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-void); color: var(--text-main); margin: 0; padding-bottom: 140px; }
         
         .topbar { background: var(--bg-panel); border-bottom: 1px solid var(--border-color); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .res-bar { display: flex; gap: 20px; background: #0f172a; padding: 5px 20px; border-radius: 20px; border: 1px solid #334155; }
@@ -36,10 +48,11 @@
         .ship-card { background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; display: flex; gap: 15px; align-items: center; position: relative; }
         .ship-card img { width: 85px; height: 85px; border-radius: 8px; object-fit: cover; border: 2px solid #334155; }
         
-        .rarity-UltraRare { border-left: 4px solid #ff6363 !important; }
-        .rarity-SuperRare { border-left: 4px solid #fbbf24 !important; }
-        .rarity-Elite { border-left: 4px solid #c38dff !important; }
-        .rarity-Rare { border-left: 4px solid #4fc3f7 !important; }
+        .rarity-ur { border-left: 4px solid #ff6363 !important; }
+        .rarity-ssr { border-left: 4px solid #fbbf24 !important; }
+        .rarity-elite { border-left: 4px solid #c38dff !important; }
+        .rarity-rare { border-left: 4px solid #4fc3f7 !important; }
+        .rarity-common { border-left: 4px solid #94a3b8 !important; }
 
         .eng-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .action-btn { background-color: var(--accent-cyan); color: #000; border: none; padding: 12px; cursor: pointer; border-radius: 6px; font-weight: bold; width: 100%; margin-top: 10px; }
@@ -49,7 +62,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
         
-        /* View Toggle & Table Styles */
         .view-toggle { display: flex; gap: 5px; background: #0f172a; padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); }
         .view-btn { background: transparent; color: var(--text-muted); border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
         .view-btn.active { background: var(--bg-panel); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); box-shadow: 0 0 8px rgba(0, 242, 254, 0.2); }
@@ -62,108 +74,23 @@
         .td-ship { text-align: left; display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 13px; }
         .td-ship img { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; border: 1px solid #334155; }
         .stat-highlight { color: var(--accent-cyan); font-weight: bold; }
-		
-.compliance-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-muted);
-            
-            /* The Glassmorphism Magic */
-            background-color: rgba(11, 15, 25, 0.75); /* Semi-transparent void color */
-            backdrop-filter: blur(10px); /* Blurs the ships sliding underneath */
-            -webkit-backdrop-filter: blur(10px); /* For Safari browsers */
-            
-            padding: 10px 0 15px 0; /* Slimmed down padding */
-            border-top: 1px solid rgba(30, 41, 59, 0.6); /* Softer top border */
-            z-index: 100;
-            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3); /* Much softer shadow */
-        }
-	
-	.compliance-footer p {
-            margin: 3px 0; /* Pulls the text lines closer together */
-        }	
-		
-        .compliance-footer a {
-            color: var(--accent-cyan);
-            text-decoration: none;
-            margin: 0 5px;
-        }
-        .donate-btn {
-            background: transparent;
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-top: 8px; /* Tighter spacing */
-            transition: all 0.2s;
-        }
-        .donate-btn:hover {
-            background: rgba(0, 242, 254, 0.1);
-        }
-		
-.donate-btn-top {
-            background: rgba(0, 242, 254, 0.1);
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            padding: 6px 15px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.2s;
-            margin-right: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-		
-/* ==========================================
-           AFFILIATE BUTTON
-        ========================================== */
-        .compliance-footer a.affiliate-btn {
-            display: inline-block;
-            background: transparent;
-            border: 1px solid #c38dff; 
-            color: #c38dff; !important;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-decoration: none;
-            cursor: pointer;
-            margin-left: 10px;
-            transition: all 0.2s ease;
-			margin-top: 8px; /* Tighter spacing */
-        }
-
-        .compliance-footer a.affiliate-btn:hover {
-            background: rgba(195, 141, 255, 0.1);
-            box-shadow: 0 0 10px rgba(195, 141, 255, 0.3);
-        }
-		
-		/* ==========================================
-           HALL OF RECORDS MODAL (DASHBOARD)
-        ========================================== */
+        
+        .compliance-footer { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 11px; color: var(--text-muted); background-color: rgba(11, 15, 25, 0.75); backdrop-filter: blur(10px); padding: 10px 0 15px 0; border-top: 1px solid rgba(30, 41, 59, 0.6); z-index: 100; box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3); }
+        .compliance-footer p { margin: 3px 0; }    
+        .compliance-footer a { color: var(--accent-cyan); text-decoration: none; margin: 0 5px; }
+        
+        .donate-btn { background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer; text-transform: uppercase; margin-top: 8px; transition: all 0.2s; }
+        .donate-btn:hover { background: rgba(0, 242, 254, 0.1); }
+        
+        .donate-btn-top { background: rgba(0, 242, 254, 0.1); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); padding: 6px 15px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; margin-right: 15px; display: inline-flex; align-items: center; gap: 6px; }
+        
+        .affiliate-btn { display: inline-block; background: transparent; border: 1px solid #c38dff; color: #c38dff; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: bold; text-transform: uppercase; text-decoration: none; cursor: pointer; margin-left: 10px; transition: all 0.2s ease; margin-top: 8px; }
+        .affiliate-btn:hover { background: rgba(195, 141, 255, 0.1); box-shadow: 0 0 10px rgba(195, 141, 255, 0.3); }
+        
         .hidden { display: none !important; }
-        .modal-backdrop {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.85); z-index: 1000;
-            display: flex; justify-content: center; align-items: center;
-        }
+        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 1000; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: var(--bg-panel); border-radius: 12px; position: relative; color: white; }
-        .close-btn {
-            position: absolute; top: 15px; right: 20px; font-size: 24px;
-            background: transparent; color: var(--text-muted); border: none; cursor: pointer;
-        }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; background: transparent; color: var(--text-muted); border: none; cursor: pointer; }
         .close-btn:hover { color: white; }
 
         .roster-content { max-width: 600px; padding: 30px; border-top: 4px solid #fbbf24; box-shadow: 0 -4px 25px rgba(251, 191, 36, 0.15); width: 100%; box-sizing: border-box; }
@@ -179,91 +106,76 @@
         .supporter-list li { font-size: 0.9rem; color: #cbd5e1; }
         .roster-footer { margin-top: 30px; text-align: center; }
     </style>
-	<link rel="icon" type="image/svg+xml" href="assets/Favicon 256x256.svg">
-	<link rel="apple-touch-icon" sizes="180x180" href="assets/Browser Favicon 512x512.png">
 </head>
 <body>
 
-<div class="topbar">
+    <div class="topbar">
         <img src="assets/Navbar Logo (1).png" alt="AstraNova Home" style="height: 48px; width: auto; object-fit: contain;">
-<div class="res-bar">
+        <div class="res-bar">
             <div class="res-item">
                 <img src="https://pub-e8198c72db7e47d595a83ca5b5ddaed8.r2.dev/resources/25px-Oilicon.png" alt="Oil" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));">
                 <input type="number" id="res-oil" onchange="saveResources()">
             </div>
-            
             <div class="res-item">
                 <img src="https://pub-e8198c72db7e47d595a83ca5b5ddaed8.r2.dev/resources/25px-Coinicon.png" alt="Coins" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));">
                 <input type="number" id="res-coins" onchange="saveResources()" style="color:var(--accent-gold)">
             </div>
-            
             <div class="res-item">
                 <img src="https://pub-e8198c72db7e47d595a83ca5b5ddaed8.r2.dev/resources/23px-Wisdom_Cube.png" alt="Cubes" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));">
                 <input type="number" id="res-cubes" onchange="saveResources()" style="color:var(--accent-cyan)">
             </div>
-
             <div class="res-item">
                 <img src="https://pub-e8198c72db7e47d595a83ca5b5ddaed8.r2.dev/resources/30px-Ruby.png" alt="Gems" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));">
                 <input type="number" id="res-gems" value="0" style="color:#f472b6" readonly>
             </div>
         </div>
-<div>
+        <div>
             <button onclick="window.open('https://streamlabs.com/gamerastronomer/tip', '_blank')" class="donate-btn-top">
                 ☕ Support the Archive
             </button>
-            
             <span id="api-status"> 🟢  System Online</span>
             <button onclick="logout()" style="margin-left:20px; background:transparent; border:1px solid var(--danger); color:var(--danger); padding:5px 15px; border-radius:20px; cursor:pointer;">Logout</button>
-            
-            <!-- NEW: Hall of Records Button -->
             <button id="open-roster-btn" style="background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 5px 15px; border-radius: 20px; cursor: pointer; margin-left: 10px; font-weight: bold;">
                 📜 Hall of Records
             </button>
         </div>
-	</div>
+    </div>
+    
     <div class="tab-container">
-<div class="tabs">
+        <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('tab-command', this)">Command Center</button>
             <button class="tab-btn" onclick="switchTab('tab-shipyard', this)">Global Shipyard</button>
             <button class="tab-btn" onclick="switchTab('tab-engineering', this)">Engineering Bay</button>
             <button class="tab-btn" onclick="switchTab('tab-logistics', this)">Logistics</button>
-            
             <button class="tab-btn" style="color: var(--accent-cyan); margin-left: auto;" onclick="window.location.href='archive.html'">
                 🌐 Open Grand Archive
             </button>
         </div>
 
-<div id="tab-command" class="tab-content active">
-            
+        <div id="tab-command" class="tab-content active">
             <div class="panel" style="border-left: 4px solid var(--accent-gold);">
                 <h3 style="margin-top:0; color: var(--accent-gold);">⭐ Active Broadcast Fleet</h3>
                 <div id="fleet-grid" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px; background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155;">
-                    
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <div style="width: 80px; text-align: right; color: var(--text-muted); font-size: 11px; font-weight: bold; text-transform: uppercase;">Main Fleet<br>主力舰队</div>
                         <div id="grid-main" style="display: flex; gap: 10px; flex-grow: 1; min-height: 80px; border-left: 2px solid #334155; padding-left: 15px;"></div>
                     </div>
-
                     <div style="height: 1px; background: #334155; margin: 5px 0;"></div>
-
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <div style="width: 80px; text-align: right; color: var(--text-muted); font-size: 11px; font-weight: bold; text-transform: uppercase;">Vanguard<br>先锋舰队</div>
                         <div id="grid-vanguard" style="display: flex; gap: 10px; flex-grow: 1; min-height: 80px; border-left: 2px solid #334155; padding-left: 15px;"></div>
                     </div>
-
                     <div id="grid-sub-container" style="display: none; gap: 10px; align-items: center; border-top: 1px solid #334155; padding-top: 15px; margin-top: 5px;">
                         <div style="width: 80px; text-align: right; color: var(--text-muted); font-size: 11px; font-weight: bold; text-transform: uppercase;">Submarines<br>潜艇舰队</div>
                         <div id="grid-sub" style="display: flex; gap: 10px; flex-grow: 1; min-height: 80px; border-left: 2px solid #334155; padding-left: 15px;"></div>
                     </div>
-
                 </div>
             </div>
 
             <div class="panel" style="border-left: 4px solid var(--accent-cyan);">
                 <h3 style="margin-top:0; color: var(--accent-cyan);">🌐 Global Fleet Tech Network</h3>
                 <p style="font-size:12px; color:var(--text-muted); margin-top:-10px;">Total Global Fleet Technology Synchronization</p>
-                <div id="fleet-tech-display" style="display: flex; gap: 15px; flex-wrap: wrap; font-weight: bold; font-size: 14px;">
-                    </div>
+                <div id="fleet-tech-display" style="display: flex; gap: 15px; flex-wrap: wrap; font-weight: bold; font-size: 14px;"></div>
             </div>
 
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -281,7 +193,7 @@
             
             <div id="dock-container" class="grid-container"></div>
         </div>
-		
+        
         <div id="tab-shipyard" class="tab-content">
             <div class="panel">
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
@@ -301,7 +213,6 @@
         <div id="tab-engineering" class="tab-content">
             <div class="panel">
                 <h3 style="color:var(--accent-cyan); margin-top:0;">Ship Modification & Enhancement</h3>
-                
                 <input type="hidden" id="editCollectionId" value="">
 
                 <div class="eng-grid">
@@ -341,10 +252,10 @@
         </div>
     </div>
 
-<div class="compliance-footer">
+    <div class="compliance-footer">
         <img src="assets/Footer Watermark.svg" alt="AstraNova Watermark" style="height: 35px; width: auto; opacity: 0.25; margin-bottom: 5px; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.5'" onmouseout="this.style.opacity='0.25'">
         <p>AstraNova Fleet Data Protocol © 2026</p>
-<p>
+        <p>
             <a href="terms.html">Terms of Service</a> | 
             <a href="privacy.html">Privacy Policy</a> | 
             <a href="refunds.html">Refund Policy</a>
@@ -353,13 +264,11 @@
         <button class="donate-btn" onclick="window.location.href='https://streamlabs.com/gamerastronomer/tip'">
             ☕ Support the Archive
         </button>
-		<!-- NEW AFFILIATE BUTTON -->
         <a href="https://animota.net/collections/azur-lane?_pos=1&_psq=azur&_ss=e&_v=1.0&aff=144" target="_blank" class="affiliate-btn">
             📦 Expand Your Fleet (Shop Merch)
         </a>
     </div>
-	
-	<!-- HALL OF RECORDS MODAL -->
+    
     <div id="roster-modal" class="modal-backdrop hidden">
         <div class="modal-content roster-content">
             <button id="close-roster" class="close-btn">&times;</button>
@@ -369,7 +278,6 @@
             </div>
             
             <div class="roster-grid">
-                <!-- Top Tier Supporters -->
                 <div class="roster-tier tier-ur">
                     <h3>Fleet Admirals</h3>
                     <ul class="supporter-list">
@@ -377,8 +285,6 @@
                         <li>Akashi_Fan_99</li>
                     </ul>
                 </div>
-                
-                <!-- Mid Tier Supporters -->
                 <div class="roster-tier tier-ssr">
                     <h3>Captains</h3>
                     <ul class="supporter-list">
@@ -396,7 +302,8 @@
             </div>
         </div>
     </div>
-	   <script>
+    
+    <script>
         const API_URL = "https://astranova-api.onrender.com"; 
         const token = localStorage.getItem('astra_token');
         if (!token) window.location.href = 'login.html';
@@ -405,7 +312,7 @@
         let currentDockData = [];
         let activeFleetIds = JSON.parse(localStorage.getItem('astra_active_fleet')) || []; 
         let currentDockView = 'cards';
-		let globalTechBonuses = { hp: 0, fp: 0, aa: 0, avi: 0, trp: 0, rld: 0 };
+        let globalTechBonuses = { hp: 0, fp: 0, aa: 0, avi: 0, trp: 0, rld: 0 };
 
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -421,15 +328,13 @@
             renderDock(); 
         }
 
-		async function fetchMyDock() {
+        async function fetchMyDock() {
             try {
                 const res = await fetch(`${API_URL}/collection/me`, { headers: { 'Authorization': `Bearer ${token}` } });
                 currentDockData = await res.json();
                 
-                // 1. MUST BE FIRST: Calculate the global bonuses
                 globalTechBonuses = calculateGlobalFleetTech();
                 
-                // 2. NOW render the dock using those calculated bonuses
                 renderDock();
                 renderFleet();
                 
@@ -440,7 +345,18 @@
             }
         }
 
-       function renderDock() {
+        // Helper to match rarities to unified CSS classes
+        function parseRarityDashboard(rarityString) {
+            if (!rarityString) return 'common';
+            const r = rarityString.toLowerCase();
+            if (r.includes('decisive') || r.includes('ultra')) return 'ur';
+            if (r.includes('priority') || r.includes('super')) return 'ssr';
+            if (r.includes('elite')) return 'elite';
+            if (r.includes('rare')) return 'rare';
+            return 'common';
+        }
+
+        function renderDock() {
             const container = document.getElementById('dock-container');
             container.innerHTML = "";
             
@@ -478,7 +394,6 @@
                 else if (item.affection >= 100) aff = 1.06;
                 else if (item.affection >= 90) aff = 1.03;
 
-                // CHANGED TO 'let' SO WE CAN ADD THE TECH BONUSES
                 let hp = Math.floor(((s.health ?? 200) + ((s.hp_120 ?? (s.health ?? 200)) - (s.health ?? 200)) * scale) * aff) + (item.bonus_hp || 0);
                 let fp = Math.floor(((s.firepower ?? 0) + ((s.fp_120 ?? (s.firepower ?? 0)) - (s.firepower ?? 0)) * scale) * aff) + (item.bonus_fp || 0);
                 let aa = Math.floor(((s.anti_air ?? 0) + ((s.aa_120 ?? (s.anti_air ?? 0)) - (s.anti_air ?? 0)) * scale) * aff) + (item.bonus_aa || 0);
@@ -486,23 +401,13 @@
                 let trp = Math.floor(((s.torpedo ?? 0) + ((s.trp_120 ?? (s.torpedo ?? 0)) - (s.torpedo ?? 0)) * scale) * aff) + (item.bonus_trp || 0);
                 let finalRld = Math.floor((bRld + (mRld - bRld) * scale) * aff) + (item.bonus_rld || 0);
 
-                // APPLY THE GLOBAL FLEET TECH BONUSES (Filtered by Base Stats)
-				hp += globalTechBonuses.hp || 0; // Every ship gets HP
-				finalRld += globalTechBonuses.rld || 0; // Every ship gets Reload
+                hp += globalTechBonuses.hp || 0; 
+                finalRld += globalTechBonuses.rld || 0; 
 
-				// Only apply specific offensive tech if the ship actually utilizes that stat natively
-				if ((s.firepower || 0) > 0 || (s.fp_120 || 0) > 0) {
-				fp += globalTechBonuses.fp || 0;
-				}
-				if ((s.anti_air || 0) > 0 || (s.aa_120 || 0) > 0) {
-				aa += globalTechBonuses.aa || 0;
-				}
-				if ((s.aviation || 0) > 0 || (s.avi_120 || 0) > 0) {
-				avi += globalTechBonuses.avi || 0;
-				}
-				if ((s.torpedo || 0) > 0 || (s.trp_120 || 0) > 0) {
-				trp += globalTechBonuses.trp || 0;
-				}
+                if ((s.firepower || 0) > 0 || (s.fp_120 || 0) > 0) fp += globalTechBonuses.fp || 0;
+                if ((s.anti_air || 0) > 0 || (s.aa_120 || 0) > 0) aa += globalTechBonuses.aa || 0;
+                if ((s.aviation || 0) > 0 || (s.avi_120 || 0) > 0) avi += globalTechBonuses.avi || 0;
+                if ((s.torpedo || 0) > 0 || (s.trp_120 || 0) > 0) trp += globalTechBonuses.trp || 0;
 
                 const eva = Math.floor(((s.evasion ?? 0) + ((s.evasion_120 ?? (s.evasion ?? 0)) - (s.evasion ?? 0)) * scale) * aff);
                 const acc = Math.floor(((s.accuracy ?? 0) + ((s.accuracy_120 ?? (s.accuracy ?? 0)) - (s.accuracy ?? 0)) * scale) * aff);
@@ -512,6 +417,8 @@
                 const lck = s.luck ?? 0;
                 const armor = s.armor_type ?? 'Unknown';
 
+                const rarityCSS = parseRarityDashboard(item.ship.rarity);
+
                 if (currentDockView === 'cards') {
                     let statDisplay = `❤️ ${hp.toLocaleString()}`;
                     if (fp > 0 || (avi === 0 && trp === 0)) statDisplay += ` | ⚔️ ${fp.toLocaleString()}`;
@@ -520,7 +427,7 @@
                     if (aa > 0) statDisplay += ` | 🛡️ ${aa.toLocaleString()}`;
 
                     const card = document.createElement('div');
-                    card.className = `ship-card rarity-${item.ship.rarity.replace(/\s+/g, '')}`;
+                    card.className = `ship-card rarity-${rarityCSS}`;
                     card.innerHTML = `
                         <img src="${img}">
                         <div style="flex-grow:1">
@@ -537,7 +444,7 @@
                 } else {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="td-ship rarity-${item.ship.rarity.replace(/\s+/g, '')}" style="border-left: 3px solid; padding-left: 8px;">
+                        <td class="td-ship rarity-${rarityCSS}" style="border-left: 3px solid; padding-left: 8px;">
                             <img src="${img}">
                             ${item.ship.name}
                         </td>
@@ -558,39 +465,26 @@
             });
         }
 
-// --- UPGRADED FLEET MANAGEMENT SYSTEM ---
-
-        // Helper function to cleanly sort hull types
         function getFleetRole(hullType) {
-            if (!hullType) return 'vanguard'; // Fallback
+            if (!hullType) return 'vanguard'; 
             const hull = hullType.toLowerCase();
-            
-            // Arrays containing both full names and abbreviations
             const mainHulls = ['battleship', 'battlecruiser', 'aviation battleship', 'aircraft carrier', 'light aircraft carrier', 'repair ship', 'monitor', 'bb', 'bc', 'bbv', 'cv', 'cvl', 'ar', 'bm'];
             const subHulls = ['submarine', 'submarine carrier', 'sailing frigate', 'ss', 'ssv', 'ix'];
             
             if (mainHulls.some(h => hull.includes(h))) return 'main';
             if (subHulls.some(h => hull.includes(h))) return 'sub';
-            
-            // Destroyers, Light/Heavy/Large Cruisers, Munition Ships default to Vanguard
             return 'vanguard'; 
         }
 
         function toggleFleet(collectionId) {
             if (activeFleetIds.includes(collectionId)) {
-                // If ship is already in fleet, remove it
                 activeFleetIds = activeFleetIds.filter(id => id !== collectionId);
             } else {
-                // Get the ship we are trying to add
                 const item = currentDockData.find(s => s.id === collectionId);
                 if (!item) return;
                 
                 const role = getFleetRole(item.ship.hull_type);
-                
-                // Count current fleet composition
-                let mainCount = 0;
-                let vanCount = 0;
-                let subCount = 0;
+                let mainCount = 0; let vanCount = 0; let subCount = 0;
                 
                 activeFleetIds.forEach(id => {
                     const activeShip = currentDockData.find(s => s.id === id);
@@ -602,22 +496,12 @@
                     }
                 });
 
-                // Enforce the 3-Ship strict limits per row
-                if (role === 'main' && mainCount >= 3) {
-                    alert("Main Fleet is full! (Maximum 3)");
-                    return;
-                } else if (role === 'vanguard' && vanCount >= 3) {
-                    alert("Vanguard Fleet is full! (Maximum 3)");
-                    return;
-                } else if (role === 'sub' && subCount >= 3) {
-                    alert("Submarine Fleet is full! (Maximum 3)");
-                    return;
-                }
+                if (role === 'main' && mainCount >= 3) { alert("Main Fleet is full! (Maximum 3)"); return; }
+                else if (role === 'vanguard' && vanCount >= 3) { alert("Vanguard Fleet is full! (Maximum 3)"); return; }
+                else if (role === 'sub' && subCount >= 3) { alert("Submarine Fleet is full! (Maximum 3)"); return; }
 
-                // If it passes the checks, add to fleet
                 activeFleetIds.push(collectionId);
             }
-            
             localStorage.setItem('astra_active_fleet', JSON.stringify(activeFleetIds));
             renderFleet();
         }
@@ -631,7 +515,6 @@
             mainContainer.innerHTML = "";
             vanContainer.innerHTML = "";
             subContainer.innerHTML = "";
-            
             let hasSubs = false;
 
             if (activeFleetIds.length === 0) {
@@ -652,43 +535,31 @@
                 const cardHtml = `
                     <div style="background: var(--bg-panel); padding: 8px; border-radius: 8px; text-align: center; border: 1px solid var(--accent-gold); width: 75px; position: relative;">
                         <div style="position: absolute; top: -8px; left: -8px; background: var(--bg-void); border: 1px solid var(--accent-cyan); font-size: 9px; padding: 2px 4px; border-radius: 4px; font-weight: bold; white-space: nowrap;">${hull}</div>
-                        <img src="${img}" style="width: 55px; height: 55px; border-radius: 6px; object-fit: cover; margin-bottom: 5px; border: 1px solid #334155;">
+                        <img src="${img}" style="width: 55px; height: 55px; border-radius: 6px; object-fit: cover; margin-bottom: 5px; border: 1px solid var(--border-color);">
                         <div style="font-weight: bold; color: #fff; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.ship.name}</div>
                         <div style="font-size: 10px; color: var(--success); margin-bottom: 5px;">Lv. ${item.level}</div>
                         <button onclick="toggleFleet(${item.id})" style="background: var(--danger); padding: 4px; font-size: 10px; width: 100%; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;">Remove</button>
                     </div>
                 `;
 
-                // Route the ship to the correct row based on her resolved Role
-                if (role === 'main') {
-                    mainContainer.innerHTML += cardHtml;
-                } else if (role === 'sub') {
-                    subContainer.innerHTML += cardHtml;
-                    hasSubs = true;
-                } else {
-                    vanContainer.innerHTML += cardHtml;
-                }
+                if (role === 'main') { mainContainer.innerHTML += cardHtml; }
+                else if (role === 'sub') { subContainer.innerHTML += cardHtml; hasSubs = true; }
+                else { vanContainer.innerHTML += cardHtml; }
             });
 
-            // Show/Hide the submarine row dynamically
             subWrapper.style.display = hasSubs ? "flex" : "none";
         }
 
-        // Sets the form to EDIT an existing ship
         function editShip(collectionId) {
             const item = currentDockData.find(s => s.id === collectionId);
             if (!item) return;
             
             switchTab('tab-engineering', document.querySelectorAll('.tab-btn')[2]);
-            
-            // Populate the hidden tracker so we know exactly which ship to update
             document.getElementById('editCollectionId').value = collectionId; 
-
             document.getElementById('shipId').value = item.ship_id; 
             document.getElementById('shipLevel').value = item.level;
             document.getElementById('shipAffection').value = item.affection;
             document.getElementById('shipOathed').checked = item.is_oathed;
-            
             document.getElementById('bonusHp').value = item.bonus_hp || 0;
             document.getElementById('bonusFp').value = item.bonus_fp || 0;
             document.getElementById('bonusAa').value = item.bonus_aa || 0;
@@ -697,10 +568,8 @@
             document.getElementById('bonusRld').value = item.bonus_rld || 0;
         }
 
-        // Handles both Updating and Adding
         async function saveShipToAPI() {
             const editId = document.getElementById('editCollectionId').value;
-            
             const payload = {
                 ship_id: parseInt(document.getElementById('shipId').value),
                 level: parseInt(document.getElementById('shipLevel').value),
@@ -715,21 +584,18 @@
             };
             
             if (editId) {
-                // If we have an ID, we send a PATCH request to UPDATE the existing ship
                 await fetch(`${API_URL}/collection/${editId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(payload)
                 });
             } else {
-                // (Fallback) If we don't have an ID, we POST a new one
                 await fetch(`${API_URL}/collection/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(payload)
                 });
             }
-            
             fetchMyDock();
             switchTab('tab-command', document.querySelector('.tab-btn'));
         }
@@ -741,7 +607,6 @@
         async function fetchGlobalLibrary() {
             const container = document.getElementById('global-library');
             container.innerHTML = `<div id="loading-msg" style="grid-column: 1/-1; text-align: center; color: var(--accent-cyan); animation: pulse 1.5s infinite;">📡 WAKING UP THE SERVER... PLEASE WAIT</div>`;
-            
             try {
                 const res = await fetch(`${API_URL}/ships/`);
                 if (!res.ok) throw new Error("Server Booting");
@@ -765,7 +630,6 @@
             });
 
             const toDisplay = filtered.slice(0, currentDisplayCount);
-            
             container.innerHTML = toDisplay.map(ship => `
                 <div class="global-card">
                     <div style="background:var(--bg-panel); padding:10px; border-radius:8px; text-align:center; border:1px solid var(--border-color)">
@@ -786,9 +650,7 @@
             }
         };
 
-        function filterLibrary() {
-            renderShipyard(true);
-        }
+        function filterLibrary() { renderShipyard(true); }
 
         async function retireShip(collectionId) {
             if (!confirm("Confirm Retirement? This ship will leave the fleet forever.")) return;
@@ -803,28 +665,18 @@
             const commons = currentDockData.filter(item => 
                 item.ship.rarity && (item.ship.rarity.toLowerCase() === "common" || item.ship.rarity.toLowerCase() === "normal")
             );
-
-            if (commons.length === 0) {
-                alert("No Common quality ships found in the dockyard.");
-                return;
-            }
-
+            if (commons.length === 0) { alert("No Common quality ships found in the dockyard."); return; }
             if (!confirm(`Commander, shall we scrap all ${commons.length} Common ships?`)) return;
 
             for (const ship of commons) {
-                await fetch(`${API_URL}/collection/${ship.id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                await fetch(`${API_URL}/collection/${ship.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
             }
             alert("Bulk Retirement successful.");
             fetchMyDock();
         }
 
-        // Adds a brand new ship from the Shipyard
         async function quickAdd(id) {
-            document.getElementById('editCollectionId').value = ""; // Clear the edit tracker
-            
+            document.getElementById('editCollectionId').value = ""; 
             await fetch(`${API_URL}/collection/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -843,10 +695,7 @@
             const currentLvl = ship.level;
             const rarity = ship.ship.rarity;
 
-            if (currentLvl >= target) {
-                alert(`Commander, ${ship.ship.name} is already at or above Level ${target}!`);
-                return;
-            }
+            if (currentLvl >= target) { alert(`Commander, ${ship.ship.name} is already at or above Level ${target}!`); return; }
 
             let coins = 0; let chips = 0; let arrays = 0;
             const milestones = [100, 105, 110, 115, 120];
@@ -878,24 +727,24 @@
             const resDiv = document.getElementById('calcResults');
             resDiv.style.display = "block";
             resDiv.innerHTML = `
-                <div style="border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 15px;">
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">
                     <h4 style="margin:0; color: white;">Awakening Plan: <span style="color:var(--accent-gold)">${ship.ship.name}</span></h4>
                     <small style="color:var(--text-muted)">From Lv.${currentLvl} to Target Lv.${target}</small>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                    <div style="text-align:center; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;">
+                    <div style="text-align:center; background:var(--bg-panel); padding:10px; border-radius:6px; border:1px solid var(--border-color);">
                         <div style="font-size:20px">🪙</div>
                         <div style="font-weight:bold; color:var(--accent-gold)">${coins.toLocaleString()}</div>
                         <div style="font-size:10px; color:var(--text-muted)">COINS</div>
                     </div>
-                    <div style="text-align:center; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;">
+                    <div style="text-align:center; background:var(--bg-panel); padding:10px; border-radius:6px; border:1px solid var(--border-color);">
                         <div style="font-size:20px">🧬</div>
                         <div style="font-weight:bold; color:var(--accent-cyan)">${chips.toLocaleString()}</div>
                         <div style="font-size:10px; color:var(--text-muted)">CHIPS</div>
                     </div>
-                    <div style="text-align:center; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;">
+                    <div style="text-align:center; background:var(--bg-panel); padding:10px; border-radius:6px; border:1px solid var(--border-color);">
                         <div style="font-size:20px">💠</div>
-                        <div style="font-weight:bold; color:#c38dff">${arrays.toLocaleString()}</div>
+                        <div style="font-weight:bold; color:var(--elite-purple)">${arrays.toLocaleString()}</div>
                         <div style="font-size:10px; color:var(--text-muted)">ARRAYS</div>
                     </div>
                 </div>
@@ -914,24 +763,11 @@
             document.getElementById('res-cubes').value = localStorage.getItem('astra_cubes') || 0;
         }
 
-// --- Hall of Records Logic ---
         const rosterModal = document.getElementById('roster-modal');
-        const openRosterBtn = document.getElementById('open-roster-btn');
-        const closeRosterBtn = document.getElementById('close-roster');
+        document.getElementById('open-roster-btn')?.addEventListener('click', () => { rosterModal.classList.remove('hidden'); });
+        document.getElementById('close-roster')?.addEventListener('click', () => { rosterModal.classList.add('hidden'); });
+        rosterModal?.addEventListener('click', (e) => { if (e.target === rosterModal) rosterModal.classList.add('hidden'); });
 
-        if (openRosterBtn) {
-            openRosterBtn.addEventListener('click', () => { rosterModal.classList.remove('hidden'); });
-        }
-        if (closeRosterBtn) {
-            closeRosterBtn.addEventListener('click', () => { rosterModal.classList.add('hidden'); });
-        }
-        if (rosterModal) {
-            rosterModal.addEventListener('click', (e) => {
-                if (e.target === rosterModal) rosterModal.classList.add('hidden');
-            });
-        }
-
-        // ESC Key to close
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && rosterModal && !rosterModal.classList.contains('hidden')) {
                 rosterModal.classList.add('hidden');
@@ -941,11 +777,9 @@
         function logout() { localStorage.removeItem('astra_token'); window.location.href = 'login.html'; }
 
         loadResources(); fetchGlobalLibrary(); fetchMyDock();
-		
-		function calculateGlobalFleetTech() {
+        
+        function calculateGlobalFleetTech() {
             let techTotals = { hp: 0, fp: 0, aa: 0, avi: 0, trp: 0, rld: 0 };
-            
-            // 1. Filter the dock to find the MAX level version of every unique ship
             let highestLevels = {};
             currentDockData.forEach(item => {
                 if (!highestLevels[item.ship_id] || item.level > highestLevels[item.ship_id].level) {
@@ -953,7 +787,6 @@
                 }
             });
 
-            // 2. Apply the 3-Tier math to those unique ships
             Object.values(highestLevels).forEach(shipData => {
                 const s = shipData.stats;
                 if (!s) return;
@@ -968,30 +801,22 @@
                     else if (statName === 'reload') techTotals.rld += statVal;
                 };
 
-                // Tier 1: Collection Bonus (Always applied if you own the ship)
                 applyStat(s.get_stat, s.get_value);
-
-                // Tier 2: Max Limit Break Bonus (Lv 70+ proxy)
                 if (shipData.level >= 70) applyStat(s.mlb_stat, s.mlb_value);
-
-                // Tier 3: Level 120 Bonus
                 if (shipData.level >= 120) applyStat(s.lv120_stat, s.lv120_value);
             });
 
-            // 3. Render the UI
             const display = document.getElementById('fleet-tech-display');
             display.innerHTML = `
-                <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">❤️ HP: <span style="color:white">+${techTotals.hp}</span></div>
-                <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">⚔️ FP: <span style="color:var(--accent-gold)">+${techTotals.fp}</span></div>
-                <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">🛡️ AA: <span style="color:#c38dff">+${techTotals.aa}</span></div>
-                <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">✈️ AVI: <span style="color:#c38dff">+${techTotals.avi}</span></div>
-                <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">🐟 TRP: <span style="color:var(--accent-cyan)">+${techTotals.trp}</span></div>
-                <div style="background:#0f172a; padding:8px 15px; border-radius:6px; border:1px solid #334155;">⏱️ RLD: <span style="color:var(--success)">+${techTotals.rld}</span></div>
+                <div style="background:var(--bg-panel); padding:8px 15px; border-radius:6px; border:1px solid var(--border-color);">❤️ HP: <span style="color:white">+${techTotals.hp}</span></div>
+                <div style="background:var(--bg-panel); padding:8px 15px; border-radius:6px; border:1px solid var(--border-color);">⚔️ FP: <span style="color:var(--accent-gold)">+${techTotals.fp}</span></div>
+                <div style="background:var(--bg-panel); padding:8px 15px; border-radius:6px; border:1px solid var(--border-color);">🛡️ AA: <span style="color:var(--elite-purple)">+${techTotals.aa}</span></div>
+                <div style="background:var(--bg-panel); padding:8px 15px; border-radius:6px; border:1px solid var(--border-color);">✈️ AVI: <span style="color:var(--elite-purple)">+${techTotals.avi}</span></div>
+                <div style="background:var(--bg-panel); padding:8px 15px; border-radius:6px; border:1px solid var(--border-color);">🐟 TRP: <span style="color:var(--accent-cyan)">+${techTotals.trp}</span></div>
+                <div style="background:var(--bg-panel); padding:8px 15px; border-radius:6px; border:1px solid var(--border-color);">⏱️ RLD: <span style="color:var(--success)">+${techTotals.rld}</span></div>
             `;
-            
             return techTotals;
         }
     </script>
-	
 </body>
 </html>
