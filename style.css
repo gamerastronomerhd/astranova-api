@@ -924,3 +924,56 @@ body.historical-theme .ship-name {
 .skill-name { color: var(--accent-cyan); font-weight: bold; font-size: 13px; text-transform: uppercase; }
 .skill-desc { color: #cbd5e1; font-size: 11px; line-height: 1.4; }
 .awaiting-data { color: var(--text-muted); font-size: 11px; font-style: italic; }
+
+/* --- LOGIN TERMINAL LOGO --- */
+.login-header-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-logo-img {
+    width: 100%;
+    max-width: 420px; 
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* --- DASHBOARD NAVBAR LOGO --- */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* Gives some space before your first text link */
+}
+
+.nav-logo-img {
+    height: 36px; /* Keeps the logo perfectly sized within a standard navbar */
+    width: auto;
+    object-fit: contain;
+}
+
+/* --- DASHBOARD FOOTER WATERMARK --- */
+.terminal-footer {
+    margin-top: 4rem;
+    padding: 2rem 0;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-watermark {
+    height: 45px;
+    width: auto;
+    opacity: 0.25; /* Blends the logo into the dark background */
+    margin-bottom: 0.5rem;
+    transition: opacity 0.3s ease;
+}
+
+.footer-watermark:hover {
+    opacity: 0.5; /* Brightens slightly if hovered over */
+}
+
+.footer-text {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #8B949E;
+}

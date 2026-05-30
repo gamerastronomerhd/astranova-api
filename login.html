@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AstraNova | Secure Uplink</title>
+<title>AstraNova | Secure Uplink</title>
     <style>
         :root {
             --bg-void: #0b0f19;
@@ -175,15 +175,29 @@
         .donate-btn:hover {
             background: rgba(0, 242, 254, 0.1);
         }
+		
+		.login-header-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-logo-img {
+    width: 100%;
+    max-width: 420px; /* Adjust based on your login panel width */
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
     </style>
+	<link rel="icon" type="image/svg+xml" href="assets/Favicon 256x256.svg">
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="logo">
-            <h1>Astra<span>Nova</span></h1>
-            <span class="status-tag">Fleet Data Protocol v2.0</span>
+<div class="login-card">
+        <div class="login-header-container">
+            <img src="assets/Login Terminal Header.svg" alt="Project AstraNova Terminal" class="login-logo-img">
         </div>
+        <span class="status-tag" style="margin-top: -15px; margin-bottom: 30px;">Fleet Data Protocol v2.0</span>
 
         <div id="login-form">
             <div class="input-group">
