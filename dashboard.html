@@ -176,11 +176,27 @@
 <body>
 
 <div class="topbar">
-        <img src="assets/Navbar Logo.svg" alt="AstraNova Home" style="height: 36px; width: auto; object-fit: contain;">
-        <div class="res-bar">
-            <div class="res-item"><span>🛢️</span><input type="number" id="res-oil" onchange="saveResources()"></div>
-            <div class="res-item"><span>🪙</span><input type="number" id="res-coins" onchange="saveResources()" style="color:var(--accent-gold)"></div>
-            <div class="res-item"><span>🧊</span><input type="number" id="res-cubes" onchange="saveResources()" style="color:var(--accent-cyan)"></div>
+        <img src="assets/Navbar Logo.svg" alt="AstraNova Home" style="height: 48px; width: auto; object-fit: contain;">
+<div class="res-bar">
+            <div class="res-item">
+                <img src="https://pub-e8198c72db7e47d595a83ca5b5ddaed8.r2.dev/resources/25px-Oilicon.png" alt="Oil" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));">
+                <input type="number" id="res-oil" onchange="saveResources()">
+            </div>
+            
+            <div class="res-item">
+                <img src="https://pub-e8198c72db7e47d595a83ca5b5ddaed8.r2.dev/resources/25px-Coinicon.png" alt="Coins" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));">
+                <input type="number" id="res-coins" onchange="saveResources()" style="color:var(--accent-gold)">
+            </div>
+            
+            <div class="res-item">
+                <img src="https://pub-e8198c72db7e47d595a83ca5b5ddaed8.r2.dev/resources/23px-Wisdom_Cube.png" alt="Cubes" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));">
+                <input type="number" id="res-cubes" onchange="saveResources()" style="color:var(--accent-cyan)">
+            </div>
+
+            <div class="res-item">
+                <img src="https://pub-e8198c72db7e47d595a83ca5b5ddaed8.r2.dev/resources/30px-Ruby.png" alt="Gems" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));">
+                <input type="number" id="res-gems" value="0" style="color:#f472b6" readonly>
+            </div>
         </div>
 <div>
             <button onclick="window.open('https://streamlabs.com/gamerastronomer/tip', '_blank')" class="donate-btn-top">
