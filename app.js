@@ -138,9 +138,12 @@ function applyFiltersAndSort() {
     }
 }
 
+// 🟢 OPTIMIZED: Using DocumentFragment to prevent layout thrashing
 function renderGrid(ships) {
     if (!grid) return;
     grid.innerHTML = ''; 
+
+    const fragment = document.createDocumentFragment();
 
     ships.forEach(ship => {
         const card = document.createElement('div');
@@ -154,8 +157,10 @@ function renderGrid(ships) {
             <img class="ship-icon" src="${ship.icon_url}" alt="${ship.name}" onerror="this.onerror=null; this.src='https://placehold.co/100x100/1e293b/00f2fe?text=?';">
             <div class="ship-name">${ship.name}</div>
         `;
-        grid.appendChild(card);
+        fragment.appendChild(card);
     });
+    
+    grid.appendChild(fragment);
 }
 
 // ==========================================
@@ -255,14 +260,14 @@ function openDossier(ship) {
         });
     }
 
-    // --- POPULATE SKILLS ---
+    // --- 🟢 OPTIMIZED: POPULATE SKILLS ---
     const skillsContainer = document.getElementById('dossier-skills-container');
     if (skillsContainer) {
-        skillsContainer.innerHTML = ''; 
         if (ship.ship_skills && ship.ship_skills.length > 0) {
+            let skillsHTML = '';
             ship.ship_skills.forEach(skill => {
                 const iconUrl = skill.icon_url || 'https://placehold.co/48x48/1e293b/00f2fe?text=?';
-                skillsContainer.innerHTML += `
+                skillsHTML += `
                     <div class="skill-item">
                         <img class="skill-icon" src="${iconUrl}" alt="${skill.name}">
                         <div class="skill-info">
@@ -272,6 +277,7 @@ function openDossier(ship) {
                     </div>
                 `;
             });
+            skillsContainer.innerHTML = skillsHTML;
         } else {
             skillsContainer.innerHTML = '<p class="awaiting-data">No tactical skills detected in the Archive.</p>';
         }

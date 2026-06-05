@@ -225,7 +225,24 @@
             </div>
         </div>
     </div>
+<!-- 1. Load Supabase CDN Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- 2. Initialize Config Variables (Make sure these are defined before app.js) -->
+    <script>
+        // Replace these placeholder strings with your actual Supabase project credentials
+        const SUPABASE_URL = "https://xojhznvqftnwhvdxzndh.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhvamh6bnZxZnRud2h2ZHh6bmRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NTY4ODQsImV4cCI6MjA5MDQzMjg4NH0.to5JcWEKZeHeFk646cJjSUFnHbz6gr0ThFPkUG2qWsM";
+        
+        // If your app.js instantiates the client itself, it will now have access to these globals.
+        // Alternatively, initialize it here if app.js expects a pre-built client variable:
+        // const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    </script>
+
+    <!-- 3. Load your main application logic -->
     <script src="app.js"></script>
+</body>
+</html>
 
 </body>
 </html>

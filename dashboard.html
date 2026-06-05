@@ -465,64 +465,166 @@
             });
         }
 
-        function getFleetRole(hullType) {
-            if (!hullType) return 'vanguard'; 
-            const hull = hullType.toLowerCase();
-            const mainHulls = ['battleship', 'battlecruiser', 'aviation battleship', 'aircraft carrier', 'light aircraft carrier', 'repair ship', 'monitor', 'bb', 'bc', 'bbv', 'cv', 'cvl', 'ar', 'bm'];
-            const subHulls = ['submarine', 'submarine carrier', 'sailing frigate', 'ss', 'ssv', 'ix'];
-            
-            if (mainHulls.some(h => hull.includes(h))) return 'main';
-            if (subHulls.some(h => hull.includes(h))) return 'sub';
-            return 'vanguard'; 
+// 🟢 OPTIMIZED: Uses DocumentFragment to prevent layout thrashing
+function renderDock() {
+    const container = document.getElementById('dock-container');
+    container.innerHTML = "";
+    
+    let tbody;
+    if (currentDockView === 'table') {
+        container.className = "dock-table-wrapper";
+        container.innerHTML = `
+            <table class="dock-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left">Ship</th>
+                        <th>Lv</th>
+                        <th>HP</th><th>FP</th><th>TRP</th><th>AVI</th><th>AA</th><th>RLD</th>
+                        <th>EVA</th><th>ACC</th><th>ASW</th>
+                        <th>SPD</th><th>LCK</th><th>ARMOR</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="dock-tbody"></tbody>
+            </table>`;
+        tbody = document.getElementById('dock-tbody');
+    } else {
+        container.className = "grid-container";
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    currentDockData.forEach(item => {
+        const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/100x100/1e293b/00f2fe?text=?';
+        const s = item.ship.stats || {};
+        const scale = (item.level - 1) / 119;
+        const bRld = s.reload ?? 0;
+        const mRld = s.reload_120 ?? bRld;
+        
+        let aff = 1.0;
+        if (item.is_oathed) aff = 1.12;
+        else if (item.affection >= 100) aff = 1.06;
+        else if (item.affection >= 90) aff = 1.03;
+
+        let hp = Math.floor(((s.health ?? 200) + ((s.hp_120 ?? (s.health ?? 200)) - (s.health ?? 200)) * scale) * aff) + (item.bonus_hp || 0);
+        let fp = Math.floor(((s.firepower ?? 0) + ((s.fp_120 ?? (s.firepower ?? 0)) - (s.firepower ?? 0)) * scale) * aff) + (item.bonus_fp || 0);
+        let aa = Math.floor(((s.anti_air ?? 0) + ((s.aa_120 ?? (s.anti_air ?? 0)) - (s.anti_air ?? 0)) * scale) * aff) + (item.bonus_aa || 0);
+        let avi = Math.floor(((s.aviation ?? 0) + ((s.avi_120 ?? (s.aviation ?? 0)) - (s.aviation ?? 0)) * scale) * aff) + (item.bonus_avi || 0);
+        let trp = Math.floor(((s.torpedo ?? 0) + ((s.trp_120 ?? (s.torpedo ?? 0)) - (s.torpedo ?? 0)) * scale) * aff) + (item.bonus_trp || 0);
+        let finalRld = Math.floor((bRld + (mRld - bRld) * scale) * aff) + (item.bonus_rld || 0);
+
+        hp += globalTechBonuses.hp || 0; 
+        finalRld += globalTechBonuses.rld || 0; 
+
+        if ((s.firepower || 0) > 0 || (s.fp_120 || 0) > 0) fp += globalTechBonuses.fp || 0;
+        if ((s.anti_air || 0) > 0 || (s.aa_120 || 0) > 0) aa += globalTechBonuses.aa || 0;
+        if ((s.aviation || 0) > 0 || (s.avi_120 || 0) > 0) avi += globalTechBonuses.avi || 0;
+        if ((s.torpedo || 0) > 0 || (s.trp_120 || 0) > 0) trp += globalTechBonuses.trp || 0;
+
+        const eva = Math.floor(((s.evasion ?? 0) + ((s.evasion_120 ?? (s.evasion ?? 0)) - (s.evasion ?? 0)) * scale) * aff);
+        const acc = Math.floor(((s.accuracy ?? 0) + ((s.accuracy_120 ?? (s.accuracy ?? 0)) - (s.accuracy ?? 0)) * scale) * aff);
+        const asw = Math.floor(((s.anti_sub ?? 0) + ((s.anti_sub_120 ?? (s.anti_sub ?? 0)) - (s.anti_sub ?? 0)) * scale) * aff);
+
+        const spd = s.speed ?? 0;
+        const lck = s.luck ?? 0;
+        const armor = s.armor_type ?? 'Unknown';
+
+        const rarityCSS = parseRarityDashboard(item.ship.rarity);
+
+        if (currentDockView === 'cards') {
+            let statDisplay = `❤️ ${hp.toLocaleString()}`;
+            if (fp > 0 || (avi === 0 && trp === 0)) statDisplay += ` | ⚔️ ${fp.toLocaleString()}`;
+            if (trp > 0) statDisplay += ` | 🐟 ${trp.toLocaleString()}`;
+            if (avi > 0) statDisplay += ` | ✈️ ${avi.toLocaleString()}`;
+            if (aa > 0) statDisplay += ` | 🛡️ ${aa.toLocaleString()}`;
+
+            const card = document.createElement('div');
+            card.className = `ship-card rarity-${rarityCSS}`;
+            card.innerHTML = `
+                <img src="${img}">
+                <div style="flex-grow:1">
+                    <h3 style="margin:0">${item.ship.name}</h3>
+                    <div style="font-size:12px; color:var(--accent-cyan)">Lv. ${item.level}</div>
+                    <div style="font-size:11px; margin-top:5px; color:var(--text-muted)">${statDisplay}</div>
+                    <div style="display:flex; gap:5px; margin-top:8px;">
+                        <button onclick="editShip(${item.id})" style="font-size:10px; cursor:pointer; background:#334155; color:white; border:none; border-radius:4px; padding:4px 8px;">🔧 Edit</button>
+                        <button onclick="toggleFleet(${item.id})" style="font-size:10px; cursor:pointer; background:var(--accent-gold); color:black; border:none; border-radius:4px; padding:4px 8px; font-weight:bold;">⭐ Assign</button>
+                        <button onclick="retireShip(${item.id})" style="font-size:10px; cursor:pointer; background:var(--danger); color:white; border:none; border-radius:4px; padding:4px 8px;">🗑️ Retire</button>
+                    </div>
+                </div>`;
+            fragment.appendChild(card);
+        } else {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="td-ship rarity-${rarityCSS}" style="border-left: 3px solid; padding-left: 8px;">
+                    <img src="${img}">
+                    ${item.ship.name}
+                </td>
+                <td class="stat-highlight">${item.level}</td>
+                <td>${hp}</td><td>${fp}</td><td>${trp}</td><td>${avi}</td><td>${aa}</td><td style="color:var(--accent-gold); font-weight:bold">${finalRld}</td>
+                <td style="color:#94a3b8">${eva}</td><td style="color:#94a3b8">${acc}</td><td style="color:#94a3b8">${asw}</td>
+                <td>${spd}</td><td>${lck}</td><td style="text-transform:capitalize;">${armor}</td>
+                <td>
+                    <div style="display:flex; gap:4px; justify-content:center;">
+                        <button onclick="editShip(${item.id})" style="cursor:pointer; background:#334155; color:white; border:none; border-radius:4px; padding:4px 6px;" title="Edit">🔧</button>
+                        <button onclick="toggleFleet(${item.id})" style="cursor:pointer; background:var(--accent-gold); color:black; border:none; border-radius:4px; padding:4px 6px;" title="Assign">⭐</button>
+                        <button onclick="retireShip(${item.id})" style="cursor:pointer; background:var(--danger); color:white; border:none; border-radius:4px; padding:4px 6px;" title="Retire">🗑️</button>
+                    </div>
+                </td>
+            `;
+            fragment.appendChild(tr);
         }
+    });
 
-        function toggleFleet(collectionId) {
-            if (activeFleetIds.includes(collectionId)) {
-                activeFleetIds = activeFleetIds.filter(id => id !== collectionId);
-            } else {
-                const item = currentDockData.find(s => s.id === collectionId);
-                if (!item) return;
-                
-                const role = getFleetRole(item.ship.hull_type);
-                let mainCount = 0; let vanCount = 0; let subCount = 0;
-                
-                activeFleetIds.forEach(id => {
-                    const activeShip = currentDockData.find(s => s.id === id);
-                    if (activeShip) {
-                        const activeRole = getFleetRole(activeShip.ship.hull_type);
-                        if (activeRole === 'main') mainCount++;
-                        else if (activeRole === 'sub') subCount++;
-                        else vanCount++;
-                    }
-                });
+    if (currentDockView === 'table') tbody.appendChild(fragment);
+    else container.appendChild(fragment);
+}
 
-                if (role === 'main' && mainCount >= 3) { alert("Main Fleet is full! (Maximum 3)"); return; }
-                else if (role === 'vanguard' && vanCount >= 3) { alert("Vanguard Fleet is full! (Maximum 3)"); return; }
-                else if (role === 'sub' && subCount >= 3) { alert("Submarine Fleet is full! (Maximum 3)"); return; }
+// 🟢 OPTIMIZED: Builds HTML strings first before touching the DOM
+function renderFleet() {
+    const mainContainer = document.getElementById('grid-main');
+    const vanContainer = document.getElementById('grid-vanguard');
+    const subContainer = document.getElementById('grid-sub');
+    const subWrapper = document.getElementById('grid-sub-container');
+    
+    let mainHtml = "", vanHtml = "", subHtml = "";
+    let hasSubs = false;
 
-                activeFleetIds.push(collectionId);
-            }
-            localStorage.setItem('astra_active_fleet', JSON.stringify(activeFleetIds));
-            renderFleet();
-        }
+    if (activeFleetIds.length === 0) {
+        mainContainer.innerHTML = '<p style="color: var(--text-muted); margin: auto 0;">No Main Fleet assigned.</p>';
+        vanContainer.innerHTML = '<p style="color: var(--text-muted); margin: auto 0;">No Vanguard assigned.</p>';
+        subWrapper.style.display = "none";
+        return;
+    }
 
-        function renderFleet() {
-            const mainContainer = document.getElementById('grid-main');
-            const vanContainer = document.getElementById('grid-vanguard');
-            const subContainer = document.getElementById('grid-sub');
-            const subWrapper = document.getElementById('grid-sub-container');
-            
-            mainContainer.innerHTML = "";
-            vanContainer.innerHTML = "";
-            subContainer.innerHTML = "";
-            let hasSubs = false;
+    activeFleetIds.forEach(id => {
+        const item = currentDockData.find(ship => ship.id === id);
+        if (!item) return;
 
-            if (activeFleetIds.length === 0) {
-                mainContainer.innerHTML = '<p style="color: var(--text-muted); margin: auto 0;">No Main Fleet assigned.</p>';
-                vanContainer.innerHTML = '<p style="color: var(--text-muted); margin: auto 0;">No Vanguard assigned.</p>';
-                subWrapper.style.display = "none";
-                return;
-            }
+        const hull = item.ship.hull_type || "Unknown";
+        const role = getFleetRole(hull);
+        const img = (item.ship.icon_url && item.ship.icon_url !== "null") ? item.ship.icon_url : 'https://placehold.co/60x60/1e293b/00f2fe?text=?';
+        
+        const cardHtml = `
+            <div style="background: var(--bg-panel); padding: 8px; border-radius: 8px; text-align: center; border: 1px solid var(--accent-gold); width: 75px; position: relative;">
+                <div style="position: absolute; top: -8px; left: -8px; background: var(--bg-void); border: 1px solid var(--accent-cyan); font-size: 9px; padding: 2px 4px; border-radius: 4px; font-weight: bold; white-space: nowrap;">${hull}</div>
+                <img src="${img}" style="width: 55px; height: 55px; border-radius: 6px; object-fit: cover; margin-bottom: 5px; border: 1px solid var(--border-color);">
+                <div style="font-weight: bold; color: #fff; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.ship.name}</div>
+                <div style="font-size: 10px; color: var(--success); margin-bottom: 5px;">Lv. ${item.level}</div>
+                <button onclick="toggleFleet(${item.id})" style="background: var(--danger); padding: 4px; font-size: 10px; width: 100%; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;">Remove</button>
+            </div>
+        `;
+
+        if (role === 'main') { mainHtml += cardHtml; }
+        else if (role === 'sub') { subHtml += cardHtml; hasSubs = true; }
+        else { vanHtml += cardHtml; }
+    });
+
+    mainContainer.innerHTML = mainHtml;
+    vanContainer.innerHTML = vanHtml;
+    subContainer.innerHTML = subHtml;
+    subWrapper.style.display = hasSubs ? "flex" : "none";
+}
 
             activeFleetIds.forEach(id => {
                 const item = currentDockData.find(ship => ship.id === id);
@@ -661,19 +763,24 @@
             fetchMyDock();
         }
 
-        async function bulkRetireCommons() {
-            const commons = currentDockData.filter(item => 
-                item.ship.rarity && (item.ship.rarity.toLowerCase() === "common" || item.ship.rarity.toLowerCase() === "normal")
-            );
-            if (commons.length === 0) { alert("No Common quality ships found in the dockyard."); return; }
-            if (!confirm(`Commander, shall we scrap all ${commons.length} Common ships?`)) return;
+// 🟢 OPTIMIZED: Uses Promise.all to delete everything simultaneously
+async function bulkRetireCommons() {
+    const commons = currentDockData.filter(item => 
+        item.ship.rarity && (item.ship.rarity.toLowerCase() === "common" || item.ship.rarity.toLowerCase() === "normal")
+    );
+    if (commons.length === 0) { alert("No Common quality ships found in the dockyard."); return; }
+    if (!confirm(`Commander, shall we scrap all ${commons.length} Common ships?`)) return;
 
-            for (const ship of commons) {
-                await fetch(`${API_URL}/collection/${ship.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-            }
-            alert("Bulk Retirement successful.");
-            fetchMyDock();
-        }
+    // Fire all delete requests at the same time
+    const deletePromises = commons.map(ship => 
+        fetch(`${API_URL}/collection/${ship.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+    );
+    
+    await Promise.all(deletePromises);
+    
+    alert("Bulk Retirement successful.");
+    fetchMyDock();
+}
 
         async function quickAdd(id) {
             document.getElementById('editCollectionId').value = ""; 
