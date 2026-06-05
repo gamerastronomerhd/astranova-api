@@ -181,8 +181,10 @@ body {
 
 .modal-content {
     background-color: var(--card-bg); width: 90%; max-width: 1100px; height: 80vh;
-    border-radius: 12px; border: 1px solid var(--accent-cyan);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;
+    border-radius: 12px; 
+    border: 1px solid var(--modal-accent, var(--accent-cyan));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 35px var(--modal-glow, transparent); 
+    position: relative; overflow: hidden;
     display: flex; flex-direction: column;
 }
 
@@ -214,11 +216,16 @@ body {
 .scale-massive:hover { transform: scale(2.00); cursor: zoom-in; }
 
 .dossier-intel { flex: 1; padding: 3rem 2rem; display: flex; flex-direction: column; }
-.dossier-title { font-size: 2.5rem; color: var(--accent-cyan); margin-bottom: 1rem; }
+.dossier-title { font-size: 2.5rem; color: var(--modal-accent, var(--accent-cyan)); margin-bottom: 1rem; }
 .dossier-tags { display: flex; gap: 1rem; margin-bottom: 2rem; }
+
+/* Dynamic Tags */
 .tag { padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-.faction-tag { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
-.type-tag { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+.faction-tag, .type-tag {
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    color: var(--modal-accent, var(--accent-cyan)) !important;
+    border: 1px solid var(--modal-accent, var(--accent-cyan)) !important;
+}
 
 /* Stats & Skills */
 .dossier-stats-container h3 { color: var(--accent-cyan); font-size: 14px; margin-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; text-transform: uppercase; }
@@ -231,23 +238,23 @@ body {
 .stats-header-row h3 { border: none; margin: 0; padding: 0; }
 .stat-tabs { display: flex; gap: 4px; }
 .stat-tab { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
-.stat-tab:hover { border-color: var(--accent-cyan); color: #fff; }
-.stat-tab.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); }
+.stat-tab:hover { border-color: var(--modal-accent, var(--accent-cyan)); color: #fff; }
+.stat-tab.active { background: var(--modal-accent, var(--accent-cyan)); color: #000; border-color: var(--modal-accent, var(--accent-cyan)); }
 
 .skills-container { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 240px; overflow-y: auto; padding-right: 5px; padding-bottom: 15px; }
 .skills-container::-webkit-scrollbar { width: 4px; }
 .skills-container::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 4px; }
-.skill-item { display: flex; gap: 12px; background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05); align-items: flex-start; }
+.skill-item { display: flex; gap: 12px; background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 6px; border-left: 3px solid var(--modal-accent, var(--accent-cyan)); border-top: 1px solid rgba(255, 255, 255, 0.05); border-right: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); align-items: flex-start; }
 .skill-item:last-child { margin-bottom: 10px; }
 .skill-icon { width: 48px; height: 48px; border-radius: 6px; flex-shrink: 0; border: 1px solid var(--border-color); }
 .skill-info { display: flex; flex-direction: column; gap: 4px; }
-.skill-name { color: var(--accent-cyan); font-weight: bold; font-size: 13px; text-transform: uppercase; }
+.skill-name { color: var(--modal-accent, var(--accent-cyan)); font-weight: bold; font-size: 13px; text-transform: uppercase; }
 .skill-desc { color: #cbd5e1; font-size: 11px; line-height: 1.4; }
 .awaiting-data { color: var(--text-muted); font-size: 11px; font-style: italic; }
 
 /* Wardrobe Navigation */
-.skin-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(15, 23, 42, 0.6); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); border-radius: 50%; width: 45px; height: 45px; font-size: 1.2rem; cursor: pointer; z-index: 30; transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-.skin-nav-btn:hover { background: var(--accent-cyan); color: #0f172a; box-shadow: 0 0 15px rgba(34, 211, 238, 0.5); transform: translateY(-50%) scale(1.1); }
+.skin-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(15, 23, 42, 0.6); color: var(--modal-accent, var(--accent-cyan)); border: 1px solid var(--modal-accent, var(--accent-cyan)); border-radius: 50%; width: 45px; height: 45px; font-size: 1.2rem; cursor: pointer; z-index: 30; transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+.skin-nav-btn:hover { background: var(--modal-accent, var(--accent-cyan)); color: #0f172a; box-shadow: 0 0 15px var(--modal-glow, rgba(34, 211, 238, 0.5)); transform: translateY(-50%) scale(1.1); }
 .skin-prev { left: 15px; }
 .skin-next { right: 15px; }
 .skin-name-label { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; z-index: 30; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); backdrop-filter: blur(4px); text-transform: uppercase; pointer-events: none; }
@@ -294,3 +301,26 @@ body.historical-theme .filter-input, body.historical-theme .filter-dropdown { bo
 body.historical-theme .ship-card { border: 1px solid #a89f91; border-radius: 2px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
 body.historical-theme .ship-icon { filter: sepia(0.7) grayscale(0.6) contrast(1.1); border-bottom: 1px solid #a89f91; }
 body.historical-theme .ship-name { font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+/* ==========================================
+   11. DYNAMIC DOSSIER RARITY COLORING
+   ========================================== */
+.dossier-ur     { --modal-accent: #f43f5e; --modal-glow: rgba(244, 63, 94, 0.15); }
+.dossier-ssr    { --modal-accent: #fbbf24; --modal-glow: rgba(251, 191, 36, 0.15); }
+.dossier-elite  { --modal-accent: #c38dff; --modal-glow: rgba(195, 141, 255, 0.15); }
+.dossier-rare   { --modal-accent: #4fc3f7; --modal-glow: rgba(79, 195, 247, 0.15); }
+.dossier-common { --modal-accent: #94a3b8; --modal-glow: rgba(148, 163, 184, 0.15); }
+
+#dossier-rarity-badge {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: var(--modal-accent, var(--accent-cyan));
+    color: #0b0f19;
+    padding: 5px 15px;
+    font-weight: 900;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px var(--modal-glow, rgba(0, 242, 254, 0.5));
+    z-index: 10;
+}
